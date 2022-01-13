@@ -2,7 +2,8 @@ import pyshark
 # https://github.com/KimiNewt/pyshark
 #capture = pyshark.RemoteCapture('192.168.1.101', 'eth0')
 # capture = pyshark.FileCapture('wireguard_ping_tcp.pcap')
-capture = pyshark.FileCapture('SSHv2.cap')
+#capture = pyshark.FileCapture('capData/test_WGVPN.pcap')
+capture = pyshark.FileCapture('capData/test_GPVPN.pcapng')
 #capture.sniff(timeout=10)
 
 for cap in capture:
