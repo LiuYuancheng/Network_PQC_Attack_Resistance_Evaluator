@@ -27,6 +27,12 @@ import pyshark
 #capture = pyshark.FileCapture('capData/test_GPVPN.pcapng')
 #capture.sniff(timeout=10)
 
+SRC_TAG = 'Src'
+DIS_TAG = 'Dist'
+PRO_TAG = 'Prot'
+LAY_TAG = 'Layer'
+NTE_TAG = 'notEncript'
+
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class PacketParser(object):
@@ -64,12 +70,12 @@ class PacketParser(object):
                 if 'Source:' in line: srcIP = str(line.split(':')[1]).lstrip()
                 if 'Destination:' in line: distIP = str(line.split(':')[1]).lstrip()
             packetInfo = {
-            'Src': srcIP,
-            'Dist': distIP, 
-            'Prot': protocalInfo,
-            'Layer': layerList,
+                SRC_TAG: srcIP,
+                DIS_TAG: distIP, 
+                PRO_TAG: protocalInfo,
+                LAY_TAG: layerList,
             }
-            print(packetInfo)
+            #print(packetInfo)
             protocalList.append(packetInfo)
 
         return protocalList
@@ -81,18 +87,61 @@ class PacketParser(object):
                 for line in packetInfo:
                     fh.write(line)
 
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+class protcolRctDict(object):
+
+    def __init__(self, src, dist):
+        self.src = src
+        self.dist = dist
+        self.pktCount = 0
+        self.tcpCount = 0
+        self.udpCount = 0
+        self.encriptDict = {NTE_TAG:0}
+
+    def addRecord(self, dataDict):
+        self.pktCount +=1
+        if 'UDP' in dataDict[PRO_TAG]: self.udpCount +=1
+        if 'TDP' in dataDict[PRO_TAG]: self.tcpCount +=1
+        if len(dataDict[LAY_TAG]) < 4:
+            self.encriptDict[NTE_TAG] +=1
+        else:
+            for element in dataDict[LAY_TAG][3:]:
+                if element in self.encriptDict.keys():
+                    self.encriptDict[element] += 1
+                else:
+                    self.encriptDict[element] = 1
+
+    def printData(self):
+        print("src: %s" %str(self.src))
+        print("dist: %s" %str(self.dist))
+        print("pktCount: %s" %str(self.pktCount))
+        print("tcpCount: %s" %str(self.tcpCount))
+        print("udpCount: %s" %str(self.udpCount))
+        print("encriptDict: %s" %str(self.encriptDict))
+
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 def main():
     parser = PacketParser()
-    parser.loadCapFile('capData/test_WGVPN.pcap')
+    #parser.loadCapFile('capData/test_GPVPN.pcapng')
+    parser.loadCapFile('capData/test_SSHv1.pcap')
+    
     proList = parser.getProtocalList()
+    proSumDict = {}
+
     for item in proList:
-        print(item)
-
-    parser.exportInfo('packetExample/wgInfo.txt')
-
+        keyVal =   item[SRC_TAG]+'-'+item[DIS_TAG]  
+        if keyVal in proSumDict.keys():
+            proSumDict[keyVal].addRecord(item)
+        else:
+            proSumDict[keyVal] = protcolRctDict(item[SRC_TAG], item[DIS_TAG])
+    
+    #print(proSumDict)
+    for item in proSumDict.values():
+        item.printData()
+    #parser.exportInfo('packetExample/wgInfo.txt')
 
 #-----------------------------------------------------------------------------
 if __name__ == '__main__':
