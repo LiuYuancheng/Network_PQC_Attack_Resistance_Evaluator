@@ -21,8 +21,9 @@ class ProtocoCheker(object):
         print(self.scoreDict)
 
     def matchScore(self, compareDict):
-        compareDict = {'notEncript': 5, 'Layer WG': 13, 'DATALayer TLS': 3, 'TLSv1 Record Layer: Handshake Protocol: Multiple Handshake Messages': 2,
-                       'TLSv1 Record Layer: Change Cipher Spec Protocol: Change Cipher Spec': 2, 'TLSv1 Record Layer: Handshake Protocol: Encrypted Handshake Message': 2, 'TLSv1 Record Layer: Application Data Protocol: ldap': 9}
+        # function test data: 
+        #compareDict = {'notEncript': 5, 'Layer WG': 13, 'DATALayer TLS': 3, 'TLSv1 Record Layer: Handshake Protocol: Multiple Handshake Messages': 2,
+        #               'TLSv1 Record Layer: Change Cipher Spec Protocol: Change Cipher Spec': 2, 'TLSv1 Record Layer: Handshake Protocol: Encrypted Handshake Message': 2, 'TLSv1 Record Layer: Application Data Protocol: ldap': 9}
         confVal = 0
         pckCount = 0
         if not self.scoreDict:
@@ -37,7 +38,7 @@ class ProtocoCheker(object):
                     if proK in k and self.scoreDict[LAYER_A_TAG][proK] > tempVal:
                         tempVal = self.scoreDict[LAYER_A_TAG][proK]
             confVal += tempVal*val
-            print(">>" + str(tempVal))
+            #print(">>" + str(tempVal))
 
         return float(confVal)/pckCount
 

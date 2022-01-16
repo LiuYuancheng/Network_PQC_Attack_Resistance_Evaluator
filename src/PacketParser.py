@@ -120,6 +120,8 @@ class protcolRctDict(object):
         print("udpCount: %s" %str(self.udpCount))
         print("encriptDict: %s" %str(self.encriptDict))
 
+    def getEncriptDict(self):
+        return self.encriptDict
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
