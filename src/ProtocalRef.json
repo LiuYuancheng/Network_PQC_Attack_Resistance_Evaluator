@@ -1,0 +1,53 @@
+{
+    "Transport Layer": {
+        "DCCP": 0.0,
+        "SCTP": 0.0,
+        "UDP": 0.0,
+        "UDP-Lite": 0.0,
+        "TCP": 0.0,
+        "PortReference": 0.0,
+        "RTP": 0.0,
+        "RTCP": 0.0
+    },
+    "Session Layer": {
+        "NetBIOS": 1.0,
+        "NetDump": 1.0,
+        "ONC-RPC": 1.0,
+        "DCE-RPC": 1.0,
+        "HTTP": 1.0,
+        "SMTP": 1.0
+    },
+    "Presentation layer": {
+        "MIME": 1.0
+    },
+    "Application layer": {
+        "ANCP": 2.0,
+        "BOOTP": 2.0,
+        "DHCP": 2.0,
+        "DNS": 2.0,
+        "FTP": 2.0,
+        "IMAP": 2.0,
+        "iWARP-DDP": 2.0,
+        "iWARP-MPA": 2.0,
+        "iWARP-RDMAP": 2.0,
+        "NTP": 2.0,
+        "PANA": 2.0,
+        "POP": 2.0,
+        "RADIUS": 2.0,
+        "RLogin": 2.0,
+        "RSH": 2.0,
+        "SSH": 4.0,
+        "SSHv1": 3.0,
+        "SSHv2": 5.0,
+        "SNMP": 2.0,
+        "Telnet": 2.0,
+        "TFTP": 2.0,
+        "SASP": 3.0,
+        "TLS": 4.0,
+        "TLSv1": 5.0,
+        "TLSv1.1": 5.0,
+        "TLSv1.2": 6.0,
+        "TLSv1.3": 7.0,
+        "WG": 8.0
+    }
+}
