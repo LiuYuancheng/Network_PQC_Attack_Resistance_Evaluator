@@ -21,7 +21,8 @@ def main():
     parser = pp.PacketParser()
     #parser.loadCapFile('capData/test_GPVPN.pcapng')
     #parser.loadCapFile('capData/test_SSHv1.pcap')
-    parser.loadCapFile('capData/test_WGVPN.pcap')
+    #parser.loadCapFile('capData/test_WGVPN.pcap')
+    parser.loadCapFile('capData/test_normal.pcapng')
     
     proList = parser.getProtocalList()
     proSumDict = {}

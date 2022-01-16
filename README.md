@@ -37,6 +37,12 @@ The Network traffic packet collection module have two kinds of design: collect i
 
 Parsing the protocol detail from the TCP/UDP layer. Match the primitives used by the protocol then generate the confidence level of the resistance ability for Quantum Crypto Attack. Our database need to continuous update during our research.
 
+The data convert flow is shown below: 
+
+![](doc/img/dataFlow.png)
+
+
+
 ###### Result visualization module
 
 We want to design some UI/Dashboard to show all the communication between A and B in a list , then  categorized all the packet by protocol  types and highlight the result we calculated to give the user a conclusion. 

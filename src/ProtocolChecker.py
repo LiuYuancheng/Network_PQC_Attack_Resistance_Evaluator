@@ -76,7 +76,8 @@ class ProtocoCheker(object):
 
             confVal += tempVal*val
             #print(">>" + str(tempVal))
-        return float(confVal)/pckCount
+            finalScore = float(confVal)/pckCount if pckCount !=0 else confVal
+        return finalScore
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
