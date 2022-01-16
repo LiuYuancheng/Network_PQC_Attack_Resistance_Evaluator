@@ -1,53 +1,96 @@
+#!/usr/bin/python
+#-----------------------------------------------------------------------------
+# Name:        ProtocolChecker.py
+#
+# Purpose:     This module is used to check all the protocal packets above network
+#              Layer 3 and match with the Quantum safe score database to give the 
+#              final confidence level of resistence ability for the quantum cyber 
+#              attack. 
+#
+# Author:      Yuancheng Liu
+#
+# Created:     2022/01/15
+# Version:     v_0.1
+# Copyright:   n.a
+# License:     n.a
+#-----------------------------------------------------------------------------
+
 import os
 import json
-
-LAYER_T_TAG = "Transport Layer"
-LAYER_S_TAG = "Session Layer"
-LAYER_P_TAG = "Presentation layer"
-LAYER_A_TAG = "Application layer"
+import pkgGlobal as gv
 
 # https://wiki.wireshark.org/InternetProtocolFamily
 
 
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 class ProtocoCheker(object):
-
-    def __init__(self, Dblink, DbType='json'):
+    """ Count all the protocal packets and match with the Quantum safe score 
+        database to give the final confidence level of resistence ability for 
+        the quantum cyber attack. 
+    """
+    def __init__(self, Dblink, DbType='json', debugFlag=False):
         self.scoreDict = None
-        if DbType == 'json':
-            if os.path.exists(Dblink):
-                with open(Dblink) as fh:
-                    self.scoreDict = json.loads(fh.read())
-        print("Loaded the protocol Json file: ")
-        print(self.scoreDict)
+        if DbType == 'json' and os.path.exists(Dblink):
+            with open(Dblink) as fh:
+                self.scoreDict = json.loads(fh.read())
+        else:
+            print("Init Error: Can not find the QS-score json file.")
+        self.debugMD = debugFlag
+        if self.debugMD:
+            print("Loaded the protocol Json file: ")
+            print(self.scoreDict)
 
+    #-----------------------------------------------------------------------------
     def matchScore(self, compareDict):
-        # function test data: 
-        #compareDict = {'notEncript': 5, 'Layer WG': 13, 'DATALayer TLS': 3, 'TLSv1 Record Layer: Handshake Protocol: Multiple Handshake Messages': 2,
-        #               'TLSv1 Record Layer: Change Cipher Spec Protocol: Change Cipher Spec': 2, 'TLSv1 Record Layer: Handshake Protocol: Encrypted Handshake Message': 2, 'TLSv1 Record Layer: Application Data Protocol: ldap': 9}
+        """ Match the compare protocol dict with the QS-score database and get in 
+            final value.
+
+        Args:
+            compareDict ([dict]): example data:
+            compareDict = { 'notEncript': 5,
+                            'Layer WG': 13, 
+                            'DATALayer TLS': 3, 
+                            'TLSv1 Record Layer: Handshake Protocol: Multiple Handshake Messages': 2,
+                            'TLSv1 Record Layer: Change Cipher Spec Protocol: Change Cipher Spec': 2, 
+                            'TLSv1 Record Layer: Handshake Protocol: Encrypted Handshake Message': 2, 
+                            'TLSv1 Record Layer: Application Data Protocol: ldap': 9}
+        Returns:
+            [float]: final confidence level of resistence ability for  the quantum 
+            cyber attack. 
+        """
         confVal = 0
         pckCount = 0
-        if not self.scoreDict:
-            return 0
-        for k, val in compareDict.items():
+        if not self.scoreDict: return 0
+        for cKey, val in compareDict.items():
             tempVal = 0
             pckCount += val
-            if 'notEncript' in k:
+            if gv.NTE_TAG in cKey:
                 tempVal = 0
             else:
-                for proK in self.scoreDict[LAYER_A_TAG].keys():
-                    if proK in k and self.scoreDict[LAYER_A_TAG][proK] > tempVal:
-                        tempVal = self.scoreDict[LAYER_A_TAG][proK]
+                for proK in self.scoreDict[gv.LAYER_A_TAG].keys():
+                    # find the highest score: for example if it is 'TLSv1.3' it will match with
+                    # 'TLS' get 5.0 then match with 'TLSv1.3' get 7.0, then the final reuslt is 7.0.
+                    if (proK in cKey) and (self.scoreDict[gv.LAYER_A_TAG][proK] > tempVal):
+                        tempVal = self.scoreDict[gv.LAYER_A_TAG][proK]
+
             confVal += tempVal*val
             #print(">>" + str(tempVal))
-
         return float(confVal)/pckCount
 
-
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 def testCase():
     checker = ProtocoCheker('ProtocalRef.json')
-    value = checker.matchScore(None)
+    testCompareDict = { 'notEncript': 5,
+                            'Layer WG': 13, 
+                            'DATALayer TLS': 3, 
+                            'TLSv1 Record Layer: Handshake Protocol: Multiple Handshake Messages': 2,
+                            'TLSv1 Record Layer: Change Cipher Spec Protocol: Change Cipher Spec': 2, 
+                            'TLSv1 Record Layer: Handshake Protocol: Encrypted Handshake Message': 2, 
+                            'TLSv1 Record Layer: Application Data Protocol: ldap': 9}
+    value = checker.matchScore(testCompareDict)
     print('value:'+str(value))
-
 
 if __name__ == '__main__':
     testCase()

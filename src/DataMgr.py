@@ -1,3 +1,18 @@
+#!/usr/bin/python
+#-----------------------------------------------------------------------------
+# Name:        DataMgr.py
+#
+# Purpose:     Data manager 
+#
+# Author:      Yuancheng Liu
+#
+# Created:     2022/01/16
+# Version:     v_0.1
+# Copyright:   n.a
+# License:     n.a
+#-----------------------------------------------------------------------------
+
+import pkgGlobal as gv
 import PacketParser as pp
 import ProtocolChecker as pc
 
@@ -12,11 +27,11 @@ def main():
     proSumDict = {}
 
     for item in proList:
-        keyVal =  item[pp.SRC_TAG]+'-'+item[pp.DIS_TAG]  
+        keyVal =  item[gv.SRC_TAG]+'-'+item[gv.DIS_TAG]  
         if keyVal in proSumDict.keys():
             proSumDict[keyVal].addRecord(item)
         else:
-            proSumDict[keyVal] = pp.protcolRctDict(item[pp.SRC_TAG], item[pp.DIS_TAG])
+            proSumDict[keyVal] = pp.protcolRcdDict(item[gv.SRC_TAG], item[gv.DIS_TAG])
     
     print(">> Init the protocal checker: ")
     checker = pc.ProtocoCheker('ProtocalRef.json')
