@@ -18,7 +18,7 @@ print("Current source code location : %s" % dirpath)
 APP_NAME = 'Packet__Parser_PQC_v0.1'
 
 #------<CONSTANTS>-------------------------------------------------------------
-URL_LIST = os.path.join(dirpath , "urllist.txt")    # file to save the url need to process.
+PRO_SCORE_REF = os.path.join(dirpath , "ProtocalRef.json")  
 
 SRC_TAG = 'Src'
 DIS_TAG = 'Dist'
@@ -31,5 +31,19 @@ LAYER_S_TAG = "Session Layer"
 LAYER_P_TAG = "Presentation layer"
 LAYER_A_TAG = "Application layer"
 
+#------<IMAGES PATH>-------------------------------------------------------------
+IMG_FD = 'img'
+ICO_PATH = os.path.join(dirpath, IMG_FD, "geoIcon.ico")
+BGIMG_PATH = os.path.join(dirpath, IMG_FD, "SampleImg.png")
+
+
+#-------<GLOBAL VARIABLES (start with "g")>------------------------------------
+# VARIABLES are the built in data type.
+gTranspPct = 100     # Windows transparent percentage.
+gUpdateRate = 1     # main frame update rate 1 sec.
+
+
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------
-# Set the global reference here.
+iMainFrame = None   # MainFrame.
+iImagePanel = None  # Image panel.
+iCtrlPanel = None   # control panel

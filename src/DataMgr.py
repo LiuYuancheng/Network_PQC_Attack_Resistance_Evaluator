@@ -16,30 +16,46 @@ import pkgGlobal as gv
 import PacketParser as pp
 import ProtocolChecker as pc
 
+class DataMgr(object):
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.parser = pp.PacketParser()
+        self.checker = pc.ProtocoCheker(gv.PRO_SCORE_REF)
+        self.proList = None
+
+    def loadFile(self, filePath):
+        self.parser.loadCapFile(filePath)
+        self.proList = self.parser.getProtocalList()
+
+    def getCommSumDict(self):
+        proSumDict = {}
+        for item in self.proList:
+            keyVal =  item[gv.SRC_TAG]+'-'+item[gv.DIS_TAG]  
+            if keyVal in proSumDict.keys():
+                proSumDict[keyVal].addRecord(item)
+            else:
+                proSumDict[keyVal] = pp.protcolRcdDict(item[gv.SRC_TAG], item[gv.DIS_TAG])
+
+        return proSumDict
+    
+    def getCrtScore(self, proSumDict=None):
+        soreRst = {}
+        for key, item in proSumDict.items():
+            value = self.checker.matchScore(item.encriptDict)
+            soreRst[key] = value
+        return soreRst
+
+
 def main():
     print(">> Init the packet parser. ")
-    parser = pp.PacketParser()
+    dataMgr = DataMgr()
     #parser.loadCapFile('capData/test_GPVPN.pcapng')
     #parser.loadCapFile('capData/test_SSHv1.pcap')
     #parser.loadCapFile('capData/test_WGVPN.pcap')
-    parser.loadCapFile('capData/test_normal.pcapng')
-    
-    proList = parser.getProtocalList()
-    proSumDict = {}
-
-    for item in proList:
-        keyVal =  item[gv.SRC_TAG]+'-'+item[gv.DIS_TAG]  
-        if keyVal in proSumDict.keys():
-            proSumDict[keyVal].addRecord(item)
-        else:
-            proSumDict[keyVal] = pp.protcolRcdDict(item[gv.SRC_TAG], item[gv.DIS_TAG])
-    
-    print(">> Init the protocal checker: ")
-    checker = pc.ProtocoCheker('ProtocalRef.json')
-    
-    for key, item in proSumDict.items():
-        value = checker.matchScore(item.encriptDict)
-        print("Connection: " + str(key) + " QS-Confidence lvl: " +str(value))
+    dataMgr.loadFile('capData/test_normal.pcapng')
+    proSumDict = dataMgr.getCommSumDict()
+    print(dataMgr.getCrtScore(proSumDict=proSumDict))
 
         
 if __name__ == '__main__':

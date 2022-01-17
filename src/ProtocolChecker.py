@@ -4,7 +4,7 @@
 #
 # Purpose:     This module is used to check all the protocal packets above network
 #              Layer 3 and match with the Quantum safe score database to give the 
-#              final confidence level of resistence ability for the quantum cyber 
+#              final confidence level of resistance ability for the quantum cyber 
 #              attack. 
 #
 # Author:      Yuancheng Liu
