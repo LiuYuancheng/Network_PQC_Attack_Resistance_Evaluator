@@ -47,3 +47,5 @@ gUpdateRate = 1     # main frame update rate 1 sec.
 iMainFrame = None   # MainFrame.
 iImagePanel = None  # Image panel.
 iCtrlPanel = None   # control panel
+
+iDataMgr = None

@@ -32,11 +32,9 @@ class DataMgr(object):
         proSumDict = {}
         for item in self.proList:
             keyVal =  item[gv.SRC_TAG]+'-'+item[gv.DIS_TAG]  
-            if keyVal in proSumDict.keys():
-                proSumDict[keyVal].addRecord(item)
-            else:
+            if not (keyVal in proSumDict.keys()):
                 proSumDict[keyVal] = pp.protcolRcdDict(item[gv.SRC_TAG], item[gv.DIS_TAG])
-
+            proSumDict[keyVal].addRecord(item)
         return proSumDict
     
     def getCrtScore(self, proSumDict=None):
@@ -55,6 +53,8 @@ def main():
     #parser.loadCapFile('capData/test_WGVPN.pcap')
     dataMgr.loadFile('capData/test_normal.pcapng')
     proSumDict = dataMgr.getCommSumDict()
+    for item in proSumDict.values():
+        item.printData()
     print(dataMgr.getCrtScore(proSumDict=proSumDict))
 
         

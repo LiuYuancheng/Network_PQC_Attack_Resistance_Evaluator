@@ -123,7 +123,7 @@ class protcolRcdDict(object):
         """
         self.pktCount +=1
         if 'UDP' in dataDict[gv.PRO_TAG]: self.udpCount +=1
-        if 'TDP' in dataDict[gv.PRO_TAG]: self.tcpCount +=1
+        if 'TCP' in dataDict[gv.PRO_TAG]: self.tcpCount +=1
         if len(dataDict[gv.LAY_TAG]) < 4:
             self.encriptDict[gv.NTE_TAG] +=1
         else:
@@ -175,10 +175,9 @@ def testCase():
 
     for item in proList:
         keyVal = item[gv.SRC_TAG]+'-'+item[gv.DIS_TAG]
-        if keyVal in proSumDict.keys():
-            proSumDict[keyVal].addRecord(item)
-        else:
+        if not (keyVal in proSumDict.keys()):
             proSumDict[keyVal] = protcolRcdDict(item[gv.SRC_TAG], item[gv.DIS_TAG])
+        proSumDict[keyVal].addRecord(item)
 
     #print(proSumDict)
     for item in proSumDict.values():
