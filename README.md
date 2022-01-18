@@ -17,6 +17,10 @@ If we find the packet is using protocol OpenSSH 2.3.1(SSH2), as its encryption u
 
 If we find the packet is using WireGuard protocol, as it is using Curve25519 for key exchange, ChaCha20 for symmetric encryption, Poly1305 for message authentication codes, SipHash for hashtable keys and BLAKE2s for cryptographic hash function, so we are 80% confident about it have the resistance ability for Quantum Crypto Attack. 
 
+UI view: 
+
+![](doc/img/mainUI.png)
+
 
 
 ### Program Design
