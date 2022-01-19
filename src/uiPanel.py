@@ -15,7 +15,18 @@ import wx.grid
 from datetime import datetime
 import pkgGlobal as gv
 
-
+SCORE_COLOR = ( 
+                wx.Colour(194, 5, 7),
+                wx.Colour(255, 13, 13),
+                wx.Colour(255, 78, 17),
+                wx.Colour(255, 142, 21),
+                wx.Colour(250, 183, 51),                
+                wx.Colour(172, 179, 52),
+                wx.Colour(123, 182, 97),
+                wx.Colour(105, 179, 76),
+                wx.Colour(0, 86, 63),
+                wx.Colour(1, 50, 32),
+)
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class PanelFile(wx.Panel):
@@ -25,6 +36,7 @@ class PanelFile(wx.Panel):
         self.SetBackgroundColour(wx.Colour(200, 210, 200))
         self.SetSizer(self._buidUISizer())
         self.proSumDict = {}
+        self.scoreDict = {}
 
 #--PanelCtrl-------------------------------------------------------------------
     def _buidUISizer(self):
@@ -61,16 +73,24 @@ class PanelFile(wx.Panel):
 
     def updateGrid(self):
         self.grid.ClearGrid()
+        for i in range(self.grid.GetNumberRows()):
+            self.grid.SetCellBackgroundColour(i, 3, wx.Colour(255,255,255))
         self.proSumDict = gv.iDataMgr.getCommSumDict()
+        self.scoreDict = gv.iDataMgr.getCrtScore(proSumDict=self.proSumDict)
         rowIdx = 0
-        for item in self.proSumDict.values():
+        for key, value in self.proSumDict.items():
             if rowIdx > 10:
                 self.grid.AppendRows(numRows=1, updateLabels=True)
 
-            self.grid.SetCellValue(rowIdx, 0, item.getSourceIPaddr())
-            self.grid.SetCellValue(rowIdx, 1, item.getDistIPaddr())
-            self.grid.SetCellValue(rowIdx, 2, str(item.getTotolPktNum()))
-            self.grid.SetCellValue(rowIdx, 3, '0')
+            self.grid.SetCellValue(rowIdx, 0, value.getSourceIPaddr())
+            self.grid.SetCellValue(rowIdx, 1, value.getDistIPaddr())
+            self.grid.SetCellValue(rowIdx, 2, str(value.getTotolPktNum()))   
+
+            score = str(self.scoreDict[key]) if key in self.scoreDict.keys() else '0'
+            v = int(float(score)//1)
+            self.grid.SetCellBackgroundColour(rowIdx, 3, SCORE_COLOR[v])
+            self.grid.SetCellTextColour(rowIdx, 3, wx.Colour(0,0,0))
+            self.grid.SetCellValue(rowIdx, 3, score)
             rowIdx += 1
 
     def updateComDetail(self, evt):
@@ -95,11 +115,10 @@ class PanelFile(wx.Panel):
                 self.updateDetail("Encryption Layer:")
                 for key, val in dataSet.getEncriptDict().items():
                     self.updateDetail(' > ' + str(key) + ' : ' + str(val))
+            self.updateDetail("----- ******* ----- \n")
+            self.updateDetail(" Quantum crypto resistance confidence level (0-10):\n [ %s ]\n" %str(self.scoreDict[keyStr]))
+
             self.updateDetail("----- Finished ----- \n")
-
-
-
-
 
         evt.Skip()
 

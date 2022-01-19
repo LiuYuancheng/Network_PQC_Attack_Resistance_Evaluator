@@ -25,7 +25,7 @@ class UIFrame(wx.Frame):
     """ Main UI frame window."""
     def __init__(self, parent, id, title):
         """ Init the UI and parameters """
-        wx.Frame.__init__(self, parent, id, title, size=(1050, 560))
+        wx.Frame.__init__(self, parent, id, title, size=(800, 560))
         # No boader frame:
         #wx.Frame.__init__(self, parent, id, title, style=wx.MINIMIZE_BOX | wx.STAY_ON_TOP)
         self.SetBackgroundColour(wx.Colour(200, 210, 200))
@@ -41,10 +41,11 @@ class UIFrame(wx.Frame):
 
         # Set the periodic call back
         self.lastPeriodicTime = time.time()
-        self.timer = wx.Timer(self)
-        self.updateLock = False
-        self.Bind(wx.EVT_TIMER, self.periodic)
-        self.timer.Start(PERIODIC)  # every 500 ms
+        # YC: temporary disable the timer.
+        #self.timer = wx.Timer(self)
+        #self.updateLock = False
+        #self.Bind(wx.EVT_TIMER, self.periodic)
+        #self.timer.Start(PERIODIC)  # every 500 ms
 
 #-----------------------------------------------------------------------------
     def _buildToolBars(self):
@@ -101,6 +102,9 @@ class UIFrame(wx.Frame):
         mSizer.AddSpacer(5)
         #mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 560),
         #                         style=wx.LI_VERTICAL), flag=flagsR, border=2)
+        
+        bm = wx.StaticBitmap(self, -1, wx.Bitmap("img/title2.png", wx.BITMAP_TYPE_ANY))
+        mSizer.Add(bm, flag=wx.LEFT, border=2)
         mSizer.AddSpacer(5)
         #gv.iCtrlPanel = pl.PanelCtrl(self)
         #mSizer.Add(gv.iCtrlPanel, flag=flagsR, border=2)

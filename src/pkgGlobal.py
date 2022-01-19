@@ -33,7 +33,7 @@ LAYER_A_TAG = "Application layer"
 
 #------<IMAGES PATH>-------------------------------------------------------------
 IMG_FD = 'img'
-ICO_PATH = os.path.join(dirpath, IMG_FD, "geoIcon.ico")
+ICO_PATH = os.path.join(dirpath, IMG_FD, "qs2.ico")
 BGIMG_PATH = os.path.join(dirpath, IMG_FD, "SampleImg.png")
 
 
