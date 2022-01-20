@@ -54,7 +54,7 @@ class PanelFile(wx.Panel):
         self.grid.SetColSize(2, 80)
         self.grid.SetColLabelValue(2, "Packet Num")
         self.grid.SetColSize(3, 80)
-        self.grid.SetColLabelValue(3, "QS Core")
+        self.grid.SetColLabelValue(3, "QS Score")
 
         self.grid.Bind(wx.grid.EVT_GRID_LABEL_LEFT_CLICK, self.updateComDetail)
         ctSizer.Add(self.grid, flag=flagsR, border=2)
@@ -75,8 +75,10 @@ class PanelFile(wx.Panel):
         self.grid.ClearGrid()
         for i in range(self.grid.GetNumberRows()):
             self.grid.SetCellBackgroundColour(i, 3, wx.Colour(255,255,255))
-        self.proSumDict = gv.iDataMgr.getCommSumDict()
-        self.scoreDict = gv.iDataMgr.getCrtScore(proSumDict=self.proSumDict)
+        self.proSumDict = gv.iDataMgr.getProtocalDict()
+        self.scoreDict = gv.iDataMgr.getScoreDict()
+        if self.proSumDict is None: return 
+        if self.scoreDict is None: return
         rowIdx = 0
         for key, value in self.proSumDict.items():
             if rowIdx > 10:
@@ -112,11 +114,11 @@ class PanelFile(wx.Panel):
                 self.updateDetail("Total Pecket Num: %s" %str(dataSet.getTotolPktNum()))
                 self.updateDetail("Total TCP Pecket Num: %s" %str(dataSet.getTcpPktNum()))
                 self.updateDetail("Total UDP Pecket Num: %s" %str(dataSet.getUdpPktNum()))
-                self.updateDetail("Encryption Layer:")
+                self.updateDetail("Encryption Layer Section:")
                 for key, val in dataSet.getEncriptDict().items():
                     self.updateDetail(' > ' + str(key) + ' : ' + str(val))
             self.updateDetail("----- ******* ----- \n")
-            self.updateDetail(" Quantum crypto resistance confidence level (0-10):\n [ %s ]\n" %str(self.scoreDict[keyStr]))
+            self.updateDetail(" Quantum attack resistance confidence level (0-10):\n [ %s ]\n" %str(self.scoreDict[keyStr]))
 
             self.updateDetail("----- Finished ----- \n")
 

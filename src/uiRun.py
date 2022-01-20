@@ -32,20 +32,22 @@ class UIFrame(wx.Frame):
         self.SetTransparent(gv.gTranspPct*255//100)
         self.SetIcon(wx.Icon(gv.ICO_PATH))
         # define parameters:
-
+        self.capFilePath = ''
         self._buildToolBars()
         # Build UI sizer
         self.SetSizer(self._buidUISizer())
 
-        gv.iDataMgr = DataMgr.DataMgr()
-
+        gv.iDataMgr = DataMgr.DataMgrMT(1, 'DataManger Thread')
+        gv.iDataMgr.start()
+        self.newLoad = False
         # Set the periodic call back
         self.lastPeriodicTime = time.time()
         # YC: temporary disable the timer.
-        #self.timer = wx.Timer(self)
-        #self.updateLock = False
-        #self.Bind(wx.EVT_TIMER, self.periodic)
-        #self.timer.Start(PERIODIC)  # every 500 ms
+        self.timer = wx.Timer(self)
+        self.updateLock = False
+        self.Bind(wx.EVT_TIMER, self.periodic)
+        self.timer.Start(PERIODIC)  # every 500 ms
+        self.Bind(wx.EVT_CLOSE, self.onClose)
 
 #-----------------------------------------------------------------------------
     def _buildToolBars(self):
@@ -115,10 +117,13 @@ class UIFrame(wx.Frame):
         if filePath !='':
             print('Load data file: %s' %str(filePath))
             gv.iDataMgr.loadFile(filePath)
+            #gv.iDataMgr.setLoadFilePath(filePath)
             print('Finished')
-            if self.filePanel:
-                self.filePanel.updateGrid()
-        self.progressBar.SetValue(19)
+            self.newLoad = True
+            #if self.filePanel:
+            #    self.filePanel.updateGrid()
+        
+        self.progressBar.SetValue(4)
 
 #--UIFrame---------------------------------------------------------------------
     def periodic(self, event):
@@ -127,6 +132,17 @@ class UIFrame(wx.Frame):
         if (not self.updateLock) and now - self.lastPeriodicTime >= gv.gUpdateRate:
             print("main frame update at %s" % str(now))
             self.lastPeriodicTime = now
+            if self.newLoad and not gv.iDataMgr.checkUpdating():
+                self.filePanel.updateGrid()
+                print(">> update the data once")
+                self.progressBar.SetValue(19)
+                self.newLoad = False
+
+    def onClose(self,event):
+        gv.iDataMgr.stop()
+        self.timer.Stop()
+        self.Destroy()
+
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
