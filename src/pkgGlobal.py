@@ -15,7 +15,7 @@ import os
 print("Current working directory is : %s" % os.getcwd())
 dirpath = os.path.dirname(__file__)
 print("Current source code location : %s" % dirpath)
-APP_NAME = 'Packet__Parser_PQC_v0.1'
+APP_NAME = 'Packet_Parser_PQC_v0.1'
 
 #------<CONSTANTS>-------------------------------------------------------------
 PRO_SCORE_REF = os.path.join(dirpath , "ProtocalRef.json")  
@@ -48,5 +48,4 @@ gUpdateRate = 1     # main frame update rate 1 sec.
 iMainFrame = None   # MainFrame.
 iImagePanel = None  # Image panel.
 iCtrlPanel = None   # control panel
-
-iDataMgr = None
+iDataMgr = None     # data manager.

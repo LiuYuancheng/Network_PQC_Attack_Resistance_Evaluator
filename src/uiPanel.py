@@ -29,14 +29,12 @@ SCORE_COLOR = (
 )
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-class PanelFile(wx.Panel):
-    """ Function control panel."""
+class PanelProtocalDetail(wx.Panel):
+    """ Panel used to show the protocal details."""
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
         self.SetBackgroundColour(wx.Colour(200, 210, 200))
         self.SetSizer(self._buidUISizer())
-        self.proSumDict = {}
-        self.scoreDict = {}
 
 #--PanelCtrl-------------------------------------------------------------------
     def _buidUISizer(self):
@@ -48,83 +46,79 @@ class PanelFile(wx.Panel):
         self.grid.SetRowLabelSize(30)
         self.grid.CreateGrid(11,4)
         self.grid.SetColSize(0, 100)
-        self.grid.SetColLabelValue(0, "Src IP address")
+        self.grid.SetColLabelValue(0, "Src_IP_addr")
         self.grid.SetColSize(1, 100)
-        self.grid.SetColLabelValue(1, "Dist IP address")
+        self.grid.SetColLabelValue(1, "Dist_IP_addr")
         self.grid.SetColSize(2, 80)
-        self.grid.SetColLabelValue(2, "Packet Num")
+        self.grid.SetColLabelValue(2, "Packet_Num")
         self.grid.SetColSize(3, 80)
-        self.grid.SetColLabelValue(3, "QS Score")
-
+        self.grid.SetColLabelValue(3, "QS_Score")
         self.grid.Bind(wx.grid.EVT_GRID_LABEL_LEFT_CLICK, self.updateComDetail)
         ctSizer.Add(self.grid, flag=flagsR, border=2)
         #hbox0 = wx.BoxSizer(wx.HORIZONTAL)
+        
         ctSizer.AddSpacer(3)
         ctSizer.Add(wx.Button(self, label='>>', size=(25, 25)), flag=wx.CENTER, border=2)
-        # Row idx 0: show the search key and map zoom in level.
-        #hbox0.Add(wx.StaticText(self, label="Control panel".ljust(15)),
-        #          flag=flagsR, border=2)
-        #ctSizer.Add(hbox0, flag=flagsR, border=2)
+
         ctSizer.AddSpacer(3)
-        self.detailTC = wx.TextCtrl(
-            self, size=(330, 300), style=wx.TE_MULTILINE)
+        self.detailTC = wx.TextCtrl(self, size=(330, 300), style=wx.TE_MULTILINE)
         ctSizer.Add(self.detailTC, flag=flagsR, border=2)
         return ctSizer
 
+    #--PanelCtrl-------------------------------------------------------------------
     def updateGrid(self):
+        """ Update the protocal information grid. """
+        # clear grid data and cell's bg color 
         self.grid.ClearGrid()
         for i in range(self.grid.GetNumberRows()):
             self.grid.SetCellBackgroundColour(i, 3, wx.Colour(255,255,255))
-        self.proSumDict = gv.iDataMgr.getProtocalDict()
-        self.scoreDict = gv.iDataMgr.getScoreDict()
-        if self.proSumDict is None: return 
-        if self.scoreDict is None: return
+        
+        if gv.iDataMgr.getProtocalDict() is None: return 
+        if gv.iDataMgr.getScoreDict() is None: return
+        
         rowIdx = 0
-        for key, value in self.proSumDict.items():
+        for key, value in gv.iDataMgr.getProtocalDict().items():
             if rowIdx > 10:
                 self.grid.AppendRows(numRows=1, updateLabels=True)
-
+            # set protocal info cells
             self.grid.SetCellValue(rowIdx, 0, value.getSourceIPaddr())
             self.grid.SetCellValue(rowIdx, 1, value.getDistIPaddr())
             self.grid.SetCellValue(rowIdx, 2, str(value.getTotolPktNum()))   
-
-            score = str(self.scoreDict[key]) if key in self.scoreDict.keys() else '0'
-            v = int(float(score)//1)
-            self.grid.SetCellBackgroundColour(rowIdx, 3, SCORE_COLOR[v])
-            self.grid.SetCellTextColour(rowIdx, 3, wx.Colour(0,0,0))
-            self.grid.SetCellValue(rowIdx, 3, score)
+            # set the score cells 
+            score = gv.iDataMgr.getScoreDict()[key] if key in gv.iDataMgr.getScoreDict().keys() else 0.0
+            self.grid.SetCellBackgroundColour(rowIdx, 3, SCORE_COLOR[int(score//1)])
+            self.grid.SetCellTextColour(rowIdx, 3, wx.Colour(0, 0, 0))
+            self.grid.SetCellValue(rowIdx, 3, str(score))
             rowIdx += 1
 
+    #--PanelCtrl-------------------------------------------------------------------
     def updateComDetail(self, evt):
-
+        """ Update the peers communication connection detail on the text field."""
         rowIdx = int(evt.GetRow())
         srcIP = self.grid.GetCellValue(rowIdx, 0)
         distIP = self.grid.GetCellValue(rowIdx, 1)
-
         if srcIP != '' and distIP != '':
             keyStr= srcIP +'-'+distIP
-            print(keyStr)
-            if keyStr in self.proSumDict.keys():
-                self.updateDetail(None)
-                self.updateDetail("----- %s -----" % str(datetime.today()))
-                
-                dataSet = self.proSumDict[keyStr]
-                self.updateDetail("Src IP address : %s" %str(dataSet.getSourceIPaddr()))
-                self.updateDetail("Dist IP address : %s" %str(dataSet.getDistIPaddr()))
-                self.updateDetail("Total Pecket Num: %s" %str(dataSet.getTotolPktNum()))
-                self.updateDetail("Total TCP Pecket Num: %s" %str(dataSet.getTcpPktNum()))
-                self.updateDetail("Total UDP Pecket Num: %s" %str(dataSet.getUdpPktNum()))
-                self.updateDetail("Encryption Layer Section:")
+            # print(keyStr)
+            if keyStr in gv.iDataMgr.getProtocalDict().keys():
+                self.updateTFDetail(None) # clear the text field.
+                self.updateTFDetail("----- %s -----" % str(datetime.today()))
+                dataSet = gv.iDataMgr.getProtocalDict()[keyStr]
+                self.updateTFDetail("Src IP address : %s" %str(dataSet.getSourceIPaddr()))
+                self.updateTFDetail("Dist IP address : %s" %str(dataSet.getDistIPaddr()))
+                self.updateTFDetail("Total Pecket Num: %s" %str(dataSet.getTotolPktNum()))
+                self.updateTFDetail("Total TCP Pecket Num: %s" %str(dataSet.getTcpPktNum()))
+                self.updateTFDetail("Total UDP Pecket Num: %s" %str(dataSet.getUdpPktNum()))
+                self.updateTFDetail("Encryption Layer Section:")
                 for key, val in dataSet.getEncriptDict().items():
-                    self.updateDetail(' > ' + str(key) + ' : ' + str(val))
-            self.updateDetail("----- ******* ----- \n")
-            self.updateDetail(" Quantum attack resistance confidence level (0-10):\n [ %s ]\n" %str(self.scoreDict[keyStr]))
-
-            self.updateDetail("----- Finished ----- \n")
-
+                    self.updateTFDetail(' > ' + str(key) + ' : ' + str(val))
+            self.updateTFDetail("----- ******* -----")
+            self.updateTFDetail(" Quantum attack resistance confidence level (0-10):\n [ %s ]" %str(gv.iDataMgr.getScoreDict()[keyStr]))
+            self.updateTFDetail("----- Finished -----")
         evt.Skip()
 
-    def updateDetail(self, data):
+    #-----------------------------------------------------------------------------
+    def updateTFDetail(self, data):
         """ Update the data in the detail text field. Input 'None' will clear the 
             detail information text field.
         """

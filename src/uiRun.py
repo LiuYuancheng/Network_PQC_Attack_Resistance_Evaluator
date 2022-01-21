@@ -88,6 +88,7 @@ class UIFrame(wx.Frame):
         hbox1.Add(self.scValTC, flag=flagsR, border=2)  
         hbox1.AddSpacer(5)
         self.searchBt = wx.Button(self, label='Parse Data', size=(85, 22))
+        self.searchBt.Disable()
         self.searchBt.Bind(wx.EVT_BUTTON, self.onDataParse)
         hbox1.Add(self.searchBt, flag=flagsR, border=2)
         mSizer.Add(hbox1, flag=flagsR, border=2)
@@ -97,10 +98,13 @@ class UIFrame(wx.Frame):
         mSizer.Add(self.progressBar, flag=flagsR, border=2)
         
         mSizer.AddSpacer(5)
-        self.filePanel = pl.PanelFile(self)
-        mSizer.Add(self.filePanel, flag=flagsR, border=2)
+        self.protocalPanel = pl.PanelProtocalDetail(self)
+        mSizer.Add(self.protocalPanel, flag=flagsR, border=2)
         
-        mSizer.AddSpacer(5)        
+        mSizer.AddSpacer(5)
+        mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(790, -1),
+                        style=wx.LI_HORIZONTAL), flag=flagsR, border=2)
+        mSizer.AddSpacer(3)                    
         bm = wx.StaticBitmap(self, -1, wx.Bitmap(gv.BGIMG_PATH, wx.BITMAP_TYPE_ANY))
         mSizer.Add(bm, flag=wx.LEFT, border=2)
         mSizer.AddSpacer(3)
@@ -126,6 +130,7 @@ class UIFrame(wx.Frame):
         else:
             print('Warning: File %s not exist.' % str(filePath))
             self.progressBar.SetValue(0)
+        self.searchBt.Disable()
 
 #-----------------------------------------------------------------------------
     def onLoadFile(self, evt):
@@ -139,6 +144,7 @@ class UIFrame(wx.Frame):
             path = str(openFileDialog.GetPath())
             openFileDialog.Destroy()
             self.scValTC.SetValue(path)
+            self.searchBt.Enable()
         elif itemId == ID_HP:
             self.onHelp(None)
 
@@ -161,7 +167,7 @@ class UIFrame(wx.Frame):
             print("main frame update at %s" % str(now))
             self.lastPeriodicTime = now
             if self.newLoad and not gv.iDataMgr.checkUpdating():
-                self.filePanel.updateGrid()
+                self.protocalPanel.updateGrid()
                 print(">> update the pcap data once")
                 self.progressBar.SetValue(19)
                 self.newLoad = False

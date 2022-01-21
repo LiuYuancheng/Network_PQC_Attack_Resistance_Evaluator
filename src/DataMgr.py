@@ -111,7 +111,7 @@ class DataMgrMT(threading.Thread):
         self.terminate = True
 
 
-def main():
+def testCase():
     print(">> Init the packet parser. ")
     dataMgr = DataMgr()
     #parser.loadCapFile('capData/test_GPVPN.pcapng')
@@ -125,7 +125,7 @@ def main():
 
     print(">> test multi thread packet parser. ")
 
-    dataMgrMT = DataMgrMTDataMgr.DataMgrMT()
+    dataMgrMT = DataMgrMT(1, 'Test MultiThread')
     dataMgrMT.start()
     dataMgrMT.loadFile('capData/test_normal.pcapng')
 
@@ -138,4 +138,4 @@ def main():
     dataMgrMT.stop()
         
 if __name__ == '__main__':
-    main()
+    testCase()
