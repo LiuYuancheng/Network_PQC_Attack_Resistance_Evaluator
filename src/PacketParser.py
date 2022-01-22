@@ -15,8 +15,11 @@
 #-----------------------------------------------------------------------------
 
 import os
+import psutil
 import pyshark  # https://github.com/KimiNewt/pyshark
 import pkgGlobal as gv
+
+WIFI_DEV = "\\Device\\NPF_{172B21B5-878D-41B5-9C51-FE1DD27C469B}" # windows wifi dev
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -26,7 +29,7 @@ class PacketParser(object):
 
     def __init__(self, debugFlg=False):
         self.packetInfoLines = None
-        self.capture = None
+        #self.capture = None
         self.debugMD = debugFlg
 
     #-----------------------------------------------------------------------------
@@ -42,6 +45,24 @@ class PacketParser(object):
             return True
         print(">> Error: loadCapFile() file %s not found." % str(filePath))
         return False
+
+    #-----------------------------------------------------------------------------
+    def loadNetLive(self, interfaceName, packetCount = 50):
+        """ Load the network packet from the network interface.
+        """
+        addrs = psutil.net_if_addrs()
+        if interfaceName in addrs.keys():
+            capture = pyshark.LiveCapture(interface = WIFI_DEV)
+            # capture.sniff(timeout=10)
+            self.packetInfoLines = []
+            for captureArr in capture.sniff_continuously(packet_count=5):
+                print("Capured 5 live packet")
+                packetCount -=5
+                self.packetInfoLines += [str(cap).split('\n') for cap in captureArr]
+                if packetCount < 0:
+                    print("Finished capture.")
+        else:
+            print(">> Error: The network interface  %s not found." % str(interfaceName))
 
     #-----------------------------------------------------------------------------
     def getProtocalList(self):
@@ -150,28 +171,47 @@ class protcolRcdDict(object):
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-def testCase():
-    parser = PacketParser(debugFlg=True)
-    #parser.loadCapFile('capData/test_GPVPN.pcapng')
-    #parser.loadCapFile('capData/test_normal.pcapng')
-    #parser.loadCapFile('capData/test_SSHv1.pcap')
-    #parser.loadCapFile('capData/test_SSHv2.cap')
-    parser.loadCapFile('capData/test_WGVPN.pcap')
-    proList = parser.getProtocalList()
-    proSumDict = {}
+def testCase(mode=0):
+    if mode == 0:
+        parser = PacketParser(debugFlg=True)
+        #parser.loadCapFile('capData/test_GPVPN.pcapng')
+        #parser.loadCapFile('capData/test_normal.pcapng')
+        #parser.loadCapFile('capData/test_SSHv1.pcap')
+        #parser.loadCapFile('capData/test_SSHv2.cap')
+        parser.loadCapFile('capData/test_WGVPN.pcap')
+        proList = parser.getProtocalList()
+        proSumDict = {}
 
-    for item in proList:
-        keyVal = item[gv.SRC_TAG]+'-'+item[gv.DIS_TAG]
-        if not (keyVal in proSumDict.keys()):
-            proSumDict[keyVal] = protcolRcdDict(item[gv.SRC_TAG], item[gv.DIS_TAG])
-        proSumDict[keyVal].addRecord(item)
+        for item in proList:
+            keyVal = item[gv.SRC_TAG]+'-'+item[gv.DIS_TAG]
+            if not (keyVal in proSumDict.keys()):
+                proSumDict[keyVal] = protcolRcdDict(item[gv.SRC_TAG], item[gv.DIS_TAG])
+            proSumDict[keyVal].addRecord(item)
 
-    #print(proSumDict)
-    for item in proSumDict.values():
-        item.printData()
-    parser.exportInfo('packetExample/wgInfo.txt')
+        #print(proSumDict)
+        for item in proSumDict.values():
+            item.printData()
+        parser.exportInfo('packetExample/wgInfo.txt')
+    elif mode == 1:
+        parser = PacketParser(debugFlg=True)
+        parser.loadNetLive('Wi-Fi')
+        proList = parser.getProtocalList()
+        proSumDict = {}
+
+        for item in proList:
+            keyVal = item[gv.SRC_TAG]+'-'+item[gv.DIS_TAG]
+            if not (keyVal in proSumDict.keys()):
+                proSumDict[keyVal] = protcolRcdDict(item[gv.SRC_TAG], item[gv.DIS_TAG])
+            proSumDict[keyVal].addRecord(item)
+        #print(proSumDict)
+        for item in proSumDict.values():
+            item.printData()
+        parser.exportInfo('packetExample/wifiInfo.txt')
+    else:
+        print("Put your own test code here:")
+
 
 #-----------------------------------------------------------------------------
 if __name__ == '__main__':
-    testCase()
+    testCase(mode=1)
 

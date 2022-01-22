@@ -35,7 +35,7 @@ LAYER_A_TAG = "Application layer"
 IMG_FD = 'img'
 ICO_PATH = os.path.join(dirpath, IMG_FD, "qs2.ico")
 BGIMG_PATH = os.path.join(dirpath, IMG_FD, "title2.png")
-
+WINDOW_SIZE = (800, 600)
 
 
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------

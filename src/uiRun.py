@@ -6,12 +6,13 @@
 #
 # Author:      Yuancheng Liu
 #
-# Created:     2019/01/10
-# Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
-# License:     YC
+# Created:     2019/01/10 (modified on2022/01/14)
+# Version:     v_0.1
+# Copyright:   n.a
+# License:     n.a
 #-----------------------------------------------------------------------------
+
 import os
-import sys
 import time
 import wx
 import pkgGlobal as gv
@@ -19,10 +20,11 @@ import DataMgr as dm
 import uiPanel as pl
 
 PERIODIC = 500      # update in every 500ms
-ID_LF = 10
-ID_LD = 11
-ID_LN = 12
-ID_HP = 21
+
+ID_LF = 10  # load file menu ID 
+ID_LD = 11  # load directory menu ID 
+ID_LN = 12  # load LAN netowrk interface menu ID
+ID_HP = 21  # help menu ID
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -30,23 +32,23 @@ class UIFrame(wx.Frame):
     """ Main UI frame window."""
     def __init__(self, parent, id, title):
         """ Init the UI and parameters """
-        wx.Frame.__init__(self, parent, id, title, size=(800, 600))
+        wx.Frame.__init__(self, parent, id, title, size=gv.WINDOW_SIZE)
         # No boader frame:
-        #wx.Frame.__init__(self, parent, id, title, style=wx.MINIMIZE_BOX | wx.STAY_ON_TOP)
+        # wx.Frame.__init__(self, parent, id, title, style=wx.MINIMIZE_BOX | wx.STAY_ON_TOP)
         self.SetBackgroundColour(wx.Colour(200, 210, 200))
         self.SetTransparent(gv.gTranspPct*255//100)
         self.SetIcon(wx.Icon(gv.ICO_PATH))
 
         # define parameters:
         self.capFilePath = ''   # Pcap file path we want to load.
-        self.newLoad = False    # flag to identify loaded a new cap file.
-        self.updateLock = False
+        self.newLoad = False    # flag to identify program has loaded a new cap file.
+        self.updateLock = False # periodic update lock flag.
 
         # Build UI sizer
         self._buildToolBars()
         self.SetSizer(self._buidUISizer())
 
-        # define the data manager thread.
+        # define the data manager parallel thread.
         gv.iDataMgr = dm.DataMgrPT(1, 'DataManager Thread')
         gv.iDataMgr.start()
 
@@ -68,7 +70,6 @@ class UIFrame(wx.Frame):
         helpItem = helpMenu.Append(ID_HP, 'Help Information', 'Help Information')
         menubar.Append(fileMenu, '&Load Data')
         menubar.Append(helpMenu, '&Help')
-    
         self.SetMenuBar(menubar)
         self.Bind(wx.EVT_MENU, self.onLoadFile, fileItemLF)
         self.Bind(wx.EVT_MENU, self.onLoadFile, helpItem)
@@ -119,8 +120,7 @@ class UIFrame(wx.Frame):
 
 #-----------------------------------------------------------------------------
     def onDataParse(self, evt):
-        """ Handle the data parse button press action.
-        """
+        """ Handle the data parse button press action."""
         filePath = str(self.scValTC.GetValue()).strip()
         if filePath != '' and os.path.exists(filePath):
             print('Load data file: %s' % str(filePath))
