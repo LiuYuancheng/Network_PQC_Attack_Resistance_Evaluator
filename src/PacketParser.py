@@ -18,18 +18,11 @@ import os
 import pyshark  # https://github.com/KimiNewt/pyshark
 import pkgGlobal as gv
 
-# https://wiki.wireshark.org/CaptureSetup/Ethernet
-#capture = pyshark.RemoteCapture('192.168.1.101', 'eth0')
-# capture = pyshark.FileCapture('wireguard_ping_tcp.pcap')
-#capture = pyshark.FileCapture('capData/test_WGVPN.pcap')
-#capture = pyshark.FileCapture('capData/test_GPVPN.pcapng')
-#capture.sniff(timeout=10)
-
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 
 class PacketParser(object):
-    """ Parse the packet capture file to convert to layer data."""
+    """ Parse the packet capture file and convert to layer data."""
 
     def __init__(self, debugFlg=False):
         self.packetInfoLines = None
@@ -42,20 +35,20 @@ class PacketParser(object):
             Args:
                 filePath ([str]): pcap file path.
         """
-        if not os.path.exists(filePath):
-            print(">> Error: loadCapFile() file %s not found." % str(filePath))
-            return False
-        capture = pyshark.FileCapture(filePath)
-        self.packetInfoLines = [str(cap).split('\n') for cap in capture]
-        #if self.debugMD: print(str(self.packetInfoLines))
-        return True
+        if os.path.exists(filePath):
+            capture = pyshark.FileCapture(filePath)
+            self.packetInfoLines = [str(cap).split('\n') for cap in capture]
+            if self.debugMD: print(str(self.packetInfoLines))
+            return True
+        print(">> Error: loadCapFile() file %s not found." % str(filePath))
+        return False
 
     #-----------------------------------------------------------------------------
     def getProtocalList(self):
         """ Return a list of the network protocal info dict. 
-            Protocal info example: 
-            {'Src': '192.168.2.1', 'Dist': '192.168.2.133', 'Prot': 'TCP (6)', 
-            'Layer': ['Layer ETH', 'Layer IP', 'Layer TCP', 'Layer SSH']}
+            Protocol dict example: 
+                {'Src': '192.168.2.1', 'Dist': '192.168.2.133', 'Prot': 'TCP (6)', 
+                'Layer': ['Layer ETH', 'Layer IP', 'Layer TCP', 'Layer SSH']}
         """
         if (not self.packetInfoLines) or len(self.packetInfoLines) == 0:
             if self.debugMD: print("No packet data stored.")
@@ -66,17 +59,12 @@ class PacketParser(object):
             srcIP, distIP, protocalInfo = '', '', ''
             for line in packetInfo:
                 line = line.strip()
-                #result = re.search('Layer(.*):', line)
                 if len(line) > 0 and line[0] != '\t' and 'Layer' in line:
-                    if line[-1] == ':':
-                        line = line[:-1]
+                    if line[-1] == ':': line = line[:-1]
                     layerList.append(line)
-                if 'Protocol:' in line:
-                    protocalInfo = str(line.split(':')[1]).lstrip()
-                if 'Source:' in line:
-                    srcIP = str(line.split(':')[1]).lstrip()
-                if 'Destination:' in line:
-                    distIP = str(line.split(':')[1]).lstrip()
+                if 'Protocol:' in line: protocalInfo = str(line.split(':')[1]).lstrip()
+                if 'Source:' in line: srcIP = str(line.split(':')[1]).lstrip()
+                if 'Destination:' in line: distIP = str(line.split(':')[1]).lstrip()
             packetInfo = {
                 gv.SRC_TAG: srcIP,
                 gv.DIS_TAG: distIP,
@@ -91,7 +79,7 @@ class PacketParser(object):
     def exportInfo(self, filePath):
         """ Write the full packet information in a file.
             Args:
-                filePath ([type]): file name or file path.
+                filePath ([str]): file name or file path.
         """
         with open(filePath, 'w') as fh:
             for packetInfo in self.packetInfoLines:
@@ -101,25 +89,24 @@ class PacketParser(object):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class protcolRcdDict(object):
-    """ A data type class used to record all the protocal type between 2 IP 
-        address. 
+    """ A data type class used to record all the protocol types between 2 IP 
+        addresses. 
     """
-
     def __init__(self, src, dist):
         self.src = src
         self.dist = dist
         self.pktCount = 0
         self.tcpCount = 0
         self.udpCount = 0
-        self.encriptDict = {gv.NTE_TAG: 0}
+        self.encriptDict = {gv.NTE_TAG: 0} # encryption layer record dict.
 
     #-----------------------------------------------------------------------------
     def addRecord(self, dataDict):
-        """ Add a new packet info in the record 
-        Args:
-            dataDict ([dict]): example:
-             {'Src': '192.168.2.1', 'Dist': '192.168.2.133', 'Prot': 'TCP (6)', 
-             'Layer': ['Layer ETH', 'Layer IP', 'Layer TCP', 'Layer SSH']}
+        """ Add a new packet info in the encryption record dict. 
+            Args:
+                dataDict ([dict]): example:
+                {'Src': '192.168.2.1', 'Dist': '192.168.2.133', 'Prot': 'TCP (6)', 
+                'Layer': ['Layer ETH', 'Layer IP', 'Layer TCP', 'Layer SSH']}
         """
         self.pktCount +=1
         if 'UDP' in dataDict[gv.PRO_TAG]: self.udpCount +=1
@@ -166,10 +153,10 @@ class protcolRcdDict(object):
 def testCase():
     parser = PacketParser(debugFlg=True)
     #parser.loadCapFile('capData/test_GPVPN.pcapng')
-    parser.loadCapFile('capData/test_normal.pcapng')
+    #parser.loadCapFile('capData/test_normal.pcapng')
     #parser.loadCapFile('capData/test_SSHv1.pcap')
     #parser.loadCapFile('capData/test_SSHv2.cap')
-    #parser.loadCapFile('capData/test_WGVPN.pcap')
+    parser.loadCapFile('capData/test_WGVPN.pcap')
     proList = parser.getProtocalList()
     proSumDict = {}
 
@@ -182,7 +169,7 @@ def testCase():
     #print(proSumDict)
     for item in proSumDict.values():
         item.printData()
-    #parser.exportInfo('packetExample/wgInfo.txt')
+    parser.exportInfo('packetExample/wgInfo.txt')
 
 #-----------------------------------------------------------------------------
 if __name__ == '__main__':

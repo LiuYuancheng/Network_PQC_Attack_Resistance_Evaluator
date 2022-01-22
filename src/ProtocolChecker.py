@@ -3,9 +3,9 @@
 # Name:        ProtocolChecker.py
 #
 # Purpose:     This module is used to check all the protocal packets above network
-#              Layer 3 and match with the Quantum safe score database to give the 
-#              final confidence level of resistance ability for the quantum cyber 
-#              attack. 
+#              Layer 3 and match with the Quantum safe score database/dict to give 
+#              the final confidence level of the resistance ability for the quantum 
+#              cyber attack of the communication channel. 
 #
 # Author:      Yuancheng Liu
 #
@@ -18,7 +18,6 @@
 import os
 import json
 import pkgGlobal as gv
-
 # https://wiki.wireshark.org/InternetProtocolFamily
 
 
@@ -43,11 +42,12 @@ class ProtocoCheker(object):
 
     #-----------------------------------------------------------------------------
     def matchScore(self, compareDict):
-        """ Match the compare protocol dict with the QS-score database and get in 
+        """ Match the compare protocol dict with the QS-score database and get the 
             final value.
 
         Args:
-            compareDict ([dict]): example data:
+            compareDict ([dict]): 
+            example data:
             compareDict = { 'notEncript': 5,
                             'Layer WG': 13, 
                             'DATALayer TLS': 3, 
@@ -59,9 +59,9 @@ class ProtocoCheker(object):
             [float]: final confidence level of resistence ability for  the quantum 
             cyber attack. 
         """
+        if not self.scoreDict: return 0
         confVal = 0
         pckCount = 0
-        if not self.scoreDict: return 0
         for cKey, val in compareDict.items():
             tempVal = 0
             pckCount += val

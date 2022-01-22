@@ -47,7 +47,7 @@ class UIFrame(wx.Frame):
         self.SetSizer(self._buidUISizer())
 
         # define the data manager thread.
-        gv.iDataMgr = dm.DataMgrMT(1, 'DataManager Thread')
+        gv.iDataMgr = dm.DataMgrPT(1, 'DataManager Thread')
         gv.iDataMgr.start()
 
         # Set the periodic call back
