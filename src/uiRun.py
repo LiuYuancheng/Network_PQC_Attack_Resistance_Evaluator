@@ -14,7 +14,10 @@
 
 import os
 import time
+import psutil
 import wx
+
+
 import pkgGlobal as gv
 import DataMgr as dm
 import uiPanel as pl
@@ -40,6 +43,7 @@ class UIFrame(wx.Frame):
         self.SetIcon(wx.Icon(gv.ICO_PATH))
 
         # define parameters:
+        self.srcType = 'file'   # 'file' or 'networkI'
         self.capFilePath = ''   # Pcap file path we want to load.
         self.newLoad = False    # flag to identify program has loaded a new cap file.
         self.updateLock = False # periodic update lock flag.
@@ -71,8 +75,9 @@ class UIFrame(wx.Frame):
         menubar.Append(fileMenu, '&Load Data')
         menubar.Append(helpMenu, '&Help')
         self.SetMenuBar(menubar)
-        self.Bind(wx.EVT_MENU, self.onLoadFile, fileItemLF)
-        self.Bind(wx.EVT_MENU, self.onLoadFile, helpItem)
+        self.Bind(wx.EVT_MENU, self.onMenuSelect, fileItemLF)
+        self.Bind(wx.EVT_MENU, self.onMenuSelect, fileItemLI)
+        self.Bind(wx.EVT_MENU, self.onMenuSelect, helpItem)
 
 #--UIFrame---------------------------------------------------------------------
     def _buidUISizer(self):
@@ -121,19 +126,27 @@ class UIFrame(wx.Frame):
 #-----------------------------------------------------------------------------
     def onDataParse(self, evt):
         """ Handle the data parse button press action."""
-        filePath = str(self.scValTC.GetValue()).strip()
-        if filePath != '' and os.path.exists(filePath):
-            print('Load data file: %s' % str(filePath))
-            gv.iDataMgr.loadFile(filePath)
+        if self.srcType == 'file':
+            filePath = str(self.scValTC.GetValue()).strip()
+            if filePath != '' and os.path.exists(filePath):
+                print('Load data file: %s' % str(filePath))
+                gv.iDataMgr.loadFile(filePath)
+                self.newLoad = True
+                self.progressBar.SetValue(4)
+            else:
+                print('Warning: File %s not exist.' % str(filePath))
+                self.progressBar.SetValue(0)
+        elif self.srcType == 'networkI':
+            interfaceInfo = str(self.scValTC.GetValue()).strip() 
+            _ , name, pkgNum = interfaceInfo.split(':')
+            print('Load from network inerface: %s' % str(name))
+            gv.iDataMgr.loadNetLive(name, int(pkgNum))
             self.newLoad = True
             self.progressBar.SetValue(4)
-        else:
-            print('Warning: File %s not exist.' % str(filePath))
-            self.progressBar.SetValue(0)
         self.searchBt.Disable()
 
 #-----------------------------------------------------------------------------
-    def onLoadFile(self, evt):
+    def onMenuSelect(self, evt):
         itemId = evt.GetId()
         if itemId == ID_LF:
             # Create open file dialog
@@ -144,6 +157,19 @@ class UIFrame(wx.Frame):
             path = str(openFileDialog.GetPath())
             openFileDialog.Destroy()
             self.scValTC.SetValue(path)
+            self.srcType = 'file'
+            self.searchBt.Enable()
+        elif itemId == ID_LN:
+            addrs = psutil.net_if_addrs()
+            netList = addrs.keys()
+            InterfaceSelectorDialog = wx.SingleChoiceDialog(self, 'Select Network Interface You Want to Sniff', 'Network Interface', list(netList))      
+            resp = InterfaceSelectorDialog.ShowModal()
+            InterfaceName = InterfaceSelectorDialog.GetStringSelection() if resp == wx.ID_OK else ''
+            InterfaceSelectorDialog.Destroy()
+            InterfaceSelectorDialog = None
+            if resp == wx.ID_CANCEL or resp == wx.CANCEL: return
+            self.scValTC.SetValue('Interface:'+str(InterfaceName)+':30')
+            self.srcType = 'networkI'
             self.searchBt.Enable()
         elif itemId == ID_HP:
             self.onHelp(None)

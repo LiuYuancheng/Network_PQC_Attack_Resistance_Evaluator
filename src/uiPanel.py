@@ -2,7 +2,10 @@
 #-----------------------------------------------------------------------------
 # Name:        uiPanel.py
 #
-# Purpose:     This module is used to create different function panels.
+# Purpose:     This module is used to create a grid to show all the connection
+#              protocal details and a text field to show the one p2p connection
+#              packets detail information.
+# 
 # Author:      Yuancheng Liu
 #
 # Created:     2020/01/10
@@ -11,10 +14,9 @@
 #-----------------------------------------------------------------------------
 import wx
 import wx.grid
-
 from datetime import datetime
-import pkgGlobal as gv
 
+import pkgGlobal as gv
 SCORE_COLOR = ( 
                 wx.Colour(194, 5, 7),
                 wx.Colour(255, 13, 13),
@@ -55,7 +57,6 @@ class PanelProtocalDetail(wx.Panel):
         self.grid.SetColLabelValue(3, "QS_Score")
         self.grid.Bind(wx.grid.EVT_GRID_LABEL_LEFT_CLICK, self.updateComDetail)
         ctSizer.Add(self.grid, flag=flagsR, border=2)
-        #hbox0 = wx.BoxSizer(wx.HORIZONTAL)
         
         ctSizer.AddSpacer(3)
         ctSizer.Add(wx.Button(self, label='>>', size=(25, 25)), flag=wx.CENTER, border=2)
@@ -65,11 +66,12 @@ class PanelProtocalDetail(wx.Panel):
         ctSizer.Add(self.detailTC, flag=flagsR, border=2)
         return ctSizer
 
-    #--PanelCtrl-------------------------------------------------------------------
+#--PanelCtrl-------------------------------------------------------------------
     def updateGrid(self):
         """ Update the protocal information grid. """
         # clear grid data and cell's bg color 
         self.grid.ClearGrid()
+        self.updateTFDetail(None)
         for i in range(self.grid.GetNumberRows()):
             self.grid.SetCellBackgroundColour(i, 3, wx.Colour(255,255,255))
         
@@ -78,8 +80,7 @@ class PanelProtocalDetail(wx.Panel):
         
         rowIdx = 0
         for key, value in gv.iDataMgr.getProtocalDict().items():
-            if rowIdx > 10:
-                self.grid.AppendRows(numRows=1, updateLabels=True)
+            if rowIdx > 10: self.grid.AppendRows(numRows=1, updateLabels=True)
             # set protocal info cells
             self.grid.SetCellValue(rowIdx, 0, value.getSourceIPaddr())
             self.grid.SetCellValue(rowIdx, 1, value.getDistIPaddr())
@@ -91,7 +92,7 @@ class PanelProtocalDetail(wx.Panel):
             self.grid.SetCellValue(rowIdx, 3, str(score))
             rowIdx += 1
 
-    #--PanelCtrl-------------------------------------------------------------------
+#--PanelCtrl-------------------------------------------------------------------
     def updateComDetail(self, evt):
         """ Update the peers communication connection detail on the text field."""
         rowIdx = int(evt.GetRow())
@@ -127,105 +128,24 @@ class PanelProtocalDetail(wx.Panel):
         else:
             self.detailTC.AppendText(" - %s \n" %str(data))
 
-
-#-----------------------------------------------------------------------------
-#-----------------------------------------------------------------------------
-class PanelImge(wx.Panel):
-    """ Panel to display image. """
-
-    def __init__(self, parent, panelSize=(640, 480)):
-        wx.Panel.__init__(self, parent, size=panelSize)
-        self.SetBackgroundColour(wx.Colour(200, 200, 200))
-        self.panelSize = panelSize
-        self.bmp = wx.Bitmap(gv.BGIMG_PATH, wx.BITMAP_TYPE_ANY)
-        self.Bind(wx.EVT_PAINT, self.onPaint)
-        self.SetDoubleBuffered(True)
-
-#--PanelImge--------------------------------------------------------------------
-    def onPaint(self, evt):
-        """ Draw the map on the panel."""
-        dc = wx.PaintDC(self)
-        w, h = self.panelSize
-        dc.DrawBitmap(self._scaleBitmap(self.bmp, w, h), 0, 0)
-        dc.SetPen(wx.Pen('RED'))
-        dc.DrawText('This is a sample image', w//2, h//2)
-
-#--PanelImge--------------------------------------------------------------------
-    def _scaleBitmap(self, bitmap, width, height):
-        """ Resize a input bitmap.(bitmap-> image -> resize image -> bitmap)"""
-        #image = wx.ImageFromBitmap(bitmap) # used below 2.7
-        image = bitmap.ConvertToImage()
-        image = image.Scale(width, height, wx.IMAGE_QUALITY_HIGH)
-        #result = wx.BitmapFromImage(image) # used below 2.7
-        result = wx.Bitmap(image, depth=wx.BITMAP_SCREEN_DEPTH)
-        return result
-
-#--PanelImge--------------------------------------------------------------------
-    def _scaleBitmap2(self, bitmap, width, height):
-        """ Resize a input bitmap.(bitmap-> image -> resize image -> bitmap)"""
-        image = wx.ImageFromBitmap(bitmap) # used below 2.7
-        image = image.Scale(width, height, wx.IMAGE_QUALITY_HIGH)
-        result = wx.BitmapFromImage(image) # used below 2.7
-        return result
-
-#--PanelImge--------------------------------------------------------------------
-    def updateBitmap(self, bitMap):
-        """ Update the panel bitmap image."""
-        if not bitMap: return
-        self.bmp = bitMap
-
-#--PanelMap--------------------------------------------------------------------
-    def updateDisplay(self, updateFlag=None):
-        """ Set/Update the display: if called as updateDisplay() the function will 
-            update the panel, if called as updateDisplay(updateFlag=?) the function
-            will set the self update flag.
-        """
-        self.Refresh(False)
-        self.Update()
-
-#-----------------------------------------------------------------------------
-#-----------------------------------------------------------------------------
-class PanelCtrl(wx.Panel):
-    """ Function control panel."""
-
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent)
-        self.SetBackgroundColour(wx.Colour(200, 210, 200))
-        self.gpsPos = None
-        self.SetSizer(self._buidUISizer())
-
-#--PanelCtrl-------------------------------------------------------------------
-    def _buidUISizer(self):
-        """ build the control panel sizer. """
-        flagsR = wx.CENTER
-        ctSizer = wx.BoxSizer(wx.VERTICAL)
-        hbox0 = wx.BoxSizer(wx.HORIZONTAL)
-        ctSizer.AddSpacer(5)
-        # Row idx 0: show the search key and map zoom in level.
-        hbox0.Add(wx.StaticText(self, label="Control panel".ljust(15)),
-                  flag=flagsR, border=2)
-        ctSizer.Add(hbox0, flag=flagsR, border=2)
-        return ctSizer
-
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 def main():
     """ Main function used for local test debug panel. """
-
     print('Test Case start: type in the panel you want to check:')
     print('0 - PanelImge')
     print('1 - PanelCtrl')
     #pyin = str(input()).rstrip('\n')
     #testPanelIdx = int(pyin)
-    testPanelIdx = 1    # change this parameter for you to test.
+    testPanelIdx = 0    # change this parameter for you to test.
     print("[%s]" %str(testPanelIdx))
     app = wx.App()
     mainFrame = wx.Frame(gv.iMainFrame, -1, 'Debug Panel',
                          pos=(300, 300), size=(640, 480), style=wx.DEFAULT_FRAME_STYLE)
     if testPanelIdx == 0:
-        testPanel = PanelImge(mainFrame)
+        testPanel = PanelProtocalDetail(mainFrame)
     elif testPanelIdx == 1:
-        testPanel = PanelCtrl(mainFrame)
+        return
     mainFrame.Show()
     app.MainLoop()
 
