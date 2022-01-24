@@ -67,6 +67,12 @@ class DataMgr(object):
         return False
 
 #-----------------------------------------------------------------------------
+    def loadNetLive(self, interfaceName, packetCount = 10):
+        self.parser.loadNetLive(interfaceName, packetCount = packetCount)
+        self.proList = self.parser.getProtocalList()
+        return True
+
+#-----------------------------------------------------------------------------
     def getProtocalDict(self):
         return self.proSumDict
 
@@ -84,20 +90,40 @@ class DataMgrPT(threading.Thread):
         self.dataMgr = DataMgr()
         self.debugMD = debugMD
         self.fileNeedLoad = None
+        self.interfaceNeedLoad = None
+        self.interfacePacktNum = 30
         self.updateFlag = False
         self.terminate = False
         
     #-----------------------------------------------------------------------------
     def loadFile(self, filePath):
         self.fileNeedLoad = filePath
+        self.interfaceNeedLoad = None
         self.updateFlag = True
-        
+    
+    #-----------------------------------------------------------------------------
+    def loadNetLive(self, interfaceName, packetCount):
+        self.interfaceNeedLoad = interfaceName
+        self.interfacePacktNum = packetCount
+        self.fileNeedLoad = False
+        self.updateFlag = True
+        return True
+
     #-----------------------------------------------------------------------------
     def run(self):
         while not self.terminate:
             if self.updateFlag:
-                if self.debugMD: print(">> Load the data.")
-                self.dataMgr.loadFile(self.fileNeedLoad)
+                if self.debugMD: print(">> Load the data:")
+                if self.fileNeedLoad:
+                    print("From File %s" %str(self.fileNeedLoad))
+                    self.dataMgr.loadFile(self.fileNeedLoad)
+                    self.fileNeedLoad = None
+                
+                if self.interfaceNeedLoad:
+                    print('From Network Interface: %s' %str(self.interfaceNeedLoad))
+                    self.dataMgr.loadNetLive(self.interfaceNeedLoad, self.interfacePacktNum)
+                    self.interfaceNeedLoad = None
+
                 self.dataMgr.calCommSumDict()
                 self.dataMgr.calQSScore()
                 self.updateFlag = False
@@ -157,8 +183,25 @@ def testCase(mode=0):
         print(dataMgrMT.getScoreDict())
 
         dataMgrMT.stop()
+    if mode == 1: 
+        print("> Start test: load from Wifi network interface ")
+        dataMgrMT = DataMgrPT(1, 'Test MultiThread')
+        dataMgrMT.start()
+        dataMgrMT.loadNetLive('Wi-Fi', 50)
+        while dataMgrMT.checkUpdating():
+            time.sleep(0.5)
+        
+        print('>> print the protocol summery : ')
+        print(dataMgrMT.getProtocalDict())
+
+        print('>> print the quantum safe score : ')
+        print(dataMgrMT.getScoreDict())
+        dataMgrMT.stop()
+
     else:
         print('>> Put your own test code here:')
         
 if __name__ == '__main__':
-    testCase()
+    #testCase()
+    testCase(mode=1)
+

@@ -19,7 +19,7 @@ import psutil
 import pyshark  # https://github.com/KimiNewt/pyshark
 import pkgGlobal as gv
 
-WIFI_DEV = "\\Device\\NPF_{172B21B5-878D-41B5-9C51-FE1DD27C469B}" # windows wifi dev
+#WIFI_DEV = "\\Device\\NPF_{172B21B5-878D-41B5-9C51-FE1DD27C469B}" # windows wifi dev
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -29,7 +29,6 @@ class PacketParser(object):
 
     def __init__(self, debugFlg=False):
         self.packetInfoLines = None
-        #self.capture = None
         self.debugMD = debugFlg
 
     #-----------------------------------------------------------------------------
@@ -47,22 +46,21 @@ class PacketParser(object):
         return False
 
     #-----------------------------------------------------------------------------
-    def loadNetLive(self, interfaceName, packetCount = 50):
+    def loadNetLive(self, interfaceName, packetCount = 10):
         """ Load the network packet from the network interface.
         """
         addrs = psutil.net_if_addrs()
-        if interfaceName in addrs.keys():
-            capture = pyshark.LiveCapture(interface = WIFI_DEV)
-            # capture.sniff(timeout=10)
+        if interfaceName in addrs.keys() and interfaceName in gv.gInterfaceDict.keys():
+            capture = pyshark.LiveCapture(interface = gv.gInterfaceDict[interfaceName])
             self.packetInfoLines = []
-            for captureArr in capture.sniff_continuously(packet_count=5):
-                print("Capured 5 live packet")
-                packetCount -=5
-                self.packetInfoLines += [str(cap).split('\n') for cap in captureArr]
-                if packetCount < 0:
-                    print("Finished capture.")
+            for captureArr in capture.sniff_continuously(packet_count=packetCount):
+                if self.debugMD: print("Captured live packets")
+                self.packetInfoLines += [str(cap).split('\n') for cap in captureArr]  
+            print("Finished capture.")
+            return True
         else:
             print(">> Error: The network interface  %s not found." % str(interfaceName))
+            return False
 
     #-----------------------------------------------------------------------------
     def getProtocalList(self):
@@ -187,7 +185,6 @@ def testCase(mode=0):
             if not (keyVal in proSumDict.keys()):
                 proSumDict[keyVal] = protcolRcdDict(item[gv.SRC_TAG], item[gv.DIS_TAG])
             proSumDict[keyVal].addRecord(item)
-
         #print(proSumDict)
         for item in proSumDict.values():
             item.printData()
