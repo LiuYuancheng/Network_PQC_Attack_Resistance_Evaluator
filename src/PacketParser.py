@@ -86,7 +86,7 @@ class PacketParser(object):
                 if 'Destination:' in line: distIP = str(line.split(':')[1]).lstrip()
             packetInfo = {
                 gv.SRC_TAG: srcIP,
-                gv.DIS_TAG: distIP,
+                gv.DES_TAG: distIP,
                 gv.PRO_TAG: protocalInfo,
                 gv.LAY_TAG: layerList,
             }
@@ -181,9 +181,9 @@ def testCase(mode=0):
         proSumDict = {}
 
         for item in proList:
-            keyVal = item[gv.SRC_TAG]+'-'+item[gv.DIS_TAG]
+            keyVal = item[gv.SRC_TAG]+'-'+item[gv.DES_TAG]
             if not (keyVal in proSumDict.keys()):
-                proSumDict[keyVal] = protcolRcdDict(item[gv.SRC_TAG], item[gv.DIS_TAG])
+                proSumDict[keyVal] = protcolRcdDict(item[gv.SRC_TAG], item[gv.DES_TAG])
             proSumDict[keyVal].addRecord(item)
         #print(proSumDict)
         for item in proSumDict.values():
@@ -196,9 +196,9 @@ def testCase(mode=0):
         proSumDict = {}
 
         for item in proList:
-            keyVal = item[gv.SRC_TAG]+'-'+item[gv.DIS_TAG]
+            keyVal = item[gv.SRC_TAG]+'-'+item[gv.DES_TAG]
             if not (keyVal in proSumDict.keys()):
-                proSumDict[keyVal] = protcolRcdDict(item[gv.SRC_TAG], item[gv.DIS_TAG])
+                proSumDict[keyVal] = protcolRcdDict(item[gv.SRC_TAG], item[gv.DES_TAG])
             proSumDict[keyVal].addRecord(item)
         #print(proSumDict)
         for item in proSumDict.values():
@@ -210,5 +210,6 @@ def testCase(mode=0):
 
 #-----------------------------------------------------------------------------
 if __name__ == '__main__':
-    testCase(mode=1)
+    testCase()
+    #testCase(mode=1)
 

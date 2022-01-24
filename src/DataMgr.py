@@ -40,9 +40,9 @@ class DataMgr(object):
         """ Calculate the protocal summery dictionary."""
         self.proSumDict = {}
         for item in self.proList:
-            keyVal =  item[gv.SRC_TAG]+'-'+item[gv.DIS_TAG]  
+            keyVal =  item[gv.SRC_TAG]+'-'+item[gv.DES_TAG]  
             if not (keyVal in self.proSumDict.keys()):
-                self.proSumDict[keyVal] = pp.protcolRcdDict(item[gv.SRC_TAG], item[gv.DIS_TAG])
+                self.proSumDict[keyVal] = pp.protcolRcdDict(item[gv.SRC_TAG], item[gv.DES_TAG])
             self.proSumDict[keyVal].addRecord(item)
 
 #-----------------------------------------------------------------------------
@@ -202,6 +202,6 @@ def testCase(mode=0):
         print('>> Put your own test code here:')
         
 if __name__ == '__main__':
-    #testCase()
-    testCase(mode=1)
+    testCase()
+    #testCase(mode=1)
 

@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # Name:        uiRun.py
 #
-# Purpose:     This module is used as a sample to create the main wx frame.
+# Purpose:     Main UI frame.
 #
 # Author:      Yuancheng Liu
 #
@@ -16,7 +16,6 @@ import os
 import time
 import psutil
 import wx
-
 
 import pkgGlobal as gv
 import DataMgr as dm

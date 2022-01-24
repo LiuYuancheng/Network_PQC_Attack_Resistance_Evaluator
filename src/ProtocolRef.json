@@ -1,5 +1,5 @@
 {
-    "Transport Layer": {
+    "Transport layer": {
         "DCCP": 0.0,
         "SCTP": 0.0,
         "UDP": 0.0,
@@ -9,7 +9,7 @@
         "RTP": 0.0,
         "RTCP": 0.0
     },
-    "Session Layer": {
+    "Session layer": {
         "NetBIOS": 1.0,
         "NetDump": 1.0,
         "ONC-RPC": 1.0,
