@@ -54,7 +54,7 @@ class PacketParser(object):
             capture = pyshark.LiveCapture(interface = gv.gInterfaceDict[interfaceName])
             self.packetInfoLines = []
             for captureArr in capture.sniff_continuously(packet_count=packetCount):
-                if self.debugMD: print("Captured live packets")
+                if self.debugMD: print("Captured live packets.")
                 self.packetInfoLines += [str(cap).split('\n') for cap in captureArr]  
             print("Finished capture.")
             return True

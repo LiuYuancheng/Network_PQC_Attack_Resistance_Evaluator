@@ -26,7 +26,7 @@ LOOP_T = 0.5 # Thread loop time interval
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class DataMgr(object):
-    """ Manager onject integrated in to store the data.""" 
+    """ Manager object used to process and store the data.""" 
     def __init__(self) -> None:
         super().__init__()
         self.parser = pp.PacketParser()
@@ -37,7 +37,7 @@ class DataMgr(object):
 
 #-----------------------------------------------------------------------------
     def calCommSumDict(self):
-        """ Calculate the protocal summery dictionary."""
+        """ Calculate the protocol summery dictionary."""
         self.proSumDict = {}
         for item in self.proList:
             keyVal =  item[gv.SRC_TAG]+'-'+item[gv.DES_TAG]  
@@ -47,7 +47,7 @@ class DataMgr(object):
 
 #-----------------------------------------------------------------------------
     def calQSScore(self):
-        """ Calculate the current stored data's QS score."""
+        """ Calculate the QS score based on the current stored data set."""
         self.soreRst = {}
         for key, item in self.proSumDict.items():
             value = self.checker.matchScore(item.encriptDict)
@@ -55,20 +55,21 @@ class DataMgr(object):
 
 #-----------------------------------------------------------------------------
     def loadFile(self, filePath):
-        """ Load data frome the pcap file.
-        Args:
-            filePath ([str]): cap file type
+        """ Load data from the packet capture file.
+            Args:
+                filePath ([str]): cap file path.
         """
-        if os.path.exists(filePath) and (fnmatch(filePath, '*.cap') or fnmatch(filePath, '*.pcap')or fnmatch(filePath, '*.pcapng')):
+        typeCheck = fnmatch(filePath, '*.cap') or fnmatch(filePath, '*.pcap') or fnmatch(filePath, '*.pcapng')
+        if os.path.exists(filePath) and typeCheck:
             self.parser.loadCapFile(filePath)
             self.proList = self.parser.getProtocalList()
             return True
-        print(">> Error: file not exist or type not valid")
+        print(">> Error: file not exist or type not valid !")
         return False
 
 #-----------------------------------------------------------------------------
-    def loadNetLive(self, interfaceName, packetCount = 10):
-        self.parser.loadNetLive(interfaceName, packetCount = packetCount)
+    def loadNetLive(self, interfaceName, packetCount=10):
+        self.parser.loadNetLive(interfaceName, packetCount=packetCount)
         self.proList = self.parser.getProtocalList()
         return True
 
@@ -82,16 +83,16 @@ class DataMgr(object):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class DataMgrPT(threading.Thread):
-    """ A Package class used to run the data manager in parallel thread with 
+    """ A Package class used to run the data manager in a thread parallel with 
         other thread. (PT for parallel threading)
     """
     def __init__(self, threadID, name, debugMD=False):
         threading.Thread.__init__(self)
         self.dataMgr = DataMgr()
         self.debugMD = debugMD
-        self.fileNeedLoad = None
-        self.interfaceNeedLoad = None
-        self.interfacePacktNum = 30
+        self.fileNeedLoad = None    # Packet file path
+        self.interfaceNeedLoad = None   # network interface name 
+        self.interfacePacktNum = 30     # default interface capture loop number.
         self.updateFlag = False
         self.terminate = False
         
@@ -100,6 +101,7 @@ class DataMgrPT(threading.Thread):
         self.fileNeedLoad = filePath
         self.interfaceNeedLoad = None
         self.updateFlag = True
+        return True
     
     #-----------------------------------------------------------------------------
     def loadNetLive(self, interfaceName, packetCount):
@@ -128,7 +130,7 @@ class DataMgrPT(threading.Thread):
                 self.dataMgr.calQSScore()
                 self.updateFlag = False
             time.sleep(LOOP_T)
-        print("DataMangerMT thread stoped!")
+        print("DataMangerPT thread stoped!")
 
     #-----------------------------------------------------------------------------
     def getProtocalDict(self):
@@ -202,6 +204,6 @@ def testCase(mode=0):
         print('>> Put your own test code here:')
         
 if __name__ == '__main__':
-    testCase()
-    #testCase(mode=1)
+    #testCase()
+    testCase(mode=1)
 

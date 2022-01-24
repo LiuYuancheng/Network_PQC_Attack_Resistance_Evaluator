@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # Name:        ProtocolChecker.py
 #
-# Purpose:     This module is used to check all the protocal packets above network
+# Purpose:     This module is used to check all the protocol packets above network
 #              Layer 3 and match with the Quantum safe score database/dict to give 
 #              the final confidence level of the resistance ability for the quantum 
 #              cyber attack of the communication channel. 
@@ -24,7 +24,7 @@ import pkgGlobal as gv
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class ProtocoCheker(object):
-    """ Count all the protocal packets and match with the Quantum safe score 
+    """ Count all the protocol packets and match with the Quantum safe score 
         database to give the final confidence level of resistence ability for 
         the quantum cyber attack. 
     """
@@ -44,22 +44,21 @@ class ProtocoCheker(object):
     def matchScore(self, compareDict):
         """ Match the compare protocol dict with the QS-score database and get the 
             final value.
-
-        Args:
-            compareDict ([dict]): 
-            example data:
-            compareDict = { 'notEncript': 5,
-                            'Layer WG': 13, 
-                            'DATALayer TLS': 3, 
-                            'TLSv1 Record Layer: Handshake Protocol: Multiple Handshake Messages': 2,
-                            'TLSv1 Record Layer: Change Cipher Spec Protocol: Change Cipher Spec': 2, 
-                            'TLSv1 Record Layer: Handshake Protocol: Encrypted Handshake Message': 2, 
-                            'TLSv1 Record Layer: Application Data Protocol: ldap': 9}
-        Returns:
-            [float]: final confidence level of resistence ability for  the quantum 
-            cyber attack. 
+            Args:
+                compareDict ([dict]): 
+                example data:
+                compareDict = { 'notEncript': 5,
+                                'Layer WG': 13, 
+                                'DATALayer TLS': 3, 
+                                'TLSv1 Record Layer: Handshake Protocol: Multiple Handshake Messages': 2,
+                                'TLSv1 Record Layer: Change Cipher Spec Protocol: Change Cipher Spec': 2, 
+                                'TLSv1 Record Layer: Handshake Protocol: Encrypted Handshake Message': 2, 
+                                'TLSv1 Record Layer: Application Data Protocol: ldap': 9}
+            Returns:
+                [float]: final confidence level of resistence ability for the quantum 
+                cyber attack. 
         """
-        if not self.scoreDict: return 0
+        if not self.scoreDict: return 0.0
         confVal = 0
         pckCount = 0
         for cKey, val in compareDict.items():
@@ -82,7 +81,7 @@ class ProtocoCheker(object):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 def testCase():
-    checker = ProtocoCheker('ProtocalRef.json')
+    checker = ProtocoCheker('ProtocolRef.json')
     testCompareDict = { 'notEncript': 5,
                             'Layer WG': 13, 
                             'DATALayer TLS': 3, 

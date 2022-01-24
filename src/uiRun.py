@@ -33,7 +33,7 @@ ID_HP = 21  # help menu ID
 class UIFrame(wx.Frame):
     """ Main UI frame window."""
     def __init__(self, parent, id, title):
-        """ Init the UI and parameters """
+        """ Init the UI and parameters."""
         wx.Frame.__init__(self, parent, id, title, size=gv.WINDOW_SIZE)
         # No boader frame:
         # wx.Frame.__init__(self, parent, id, title, style=wx.MINIMIZE_BOX | wx.STAY_ON_TOP)
@@ -41,8 +41,8 @@ class UIFrame(wx.Frame):
         self.SetTransparent(gv.gTranspPct*255//100)
         self.SetIcon(wx.Icon(gv.ICO_PATH))
 
-        # define parameters:
-        self.srcType = 'file'   # 'file' or 'networkI'
+        # Define parameters:
+        self.srcType = 'file'   # packet data srouce file type: 'file' or 'networkI'
         self.capFilePath = ''   # Pcap file path we want to load.
         self.newLoad = False    # flag to identify program has loaded a new cap file.
         self.updateLock = False # periodic update lock flag.
@@ -51,11 +51,11 @@ class UIFrame(wx.Frame):
         self._buildToolBars()
         self.SetSizer(self._buidUISizer())
 
-        # define the data manager parallel thread.
+        # Define the data manager parallel thread.
         gv.iDataMgr = dm.DataMgrPT(1, 'DataManager Thread')
         gv.iDataMgr.start()
 
-        # Set the periodic call back
+        # Set the periodic call back.
         self.lastPeriodicTime = time.time()
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.periodic)
@@ -75,6 +75,7 @@ class UIFrame(wx.Frame):
         menubar.Append(helpMenu, '&Help')
         self.SetMenuBar(menubar)
         self.Bind(wx.EVT_MENU, self.onMenuSelect, fileItemLF)
+        self.Bind(wx.EVT_MENU, self.onMenuSelect, fileItemLD)
         self.Bind(wx.EVT_MENU, self.onMenuSelect, fileItemLI)
         self.Bind(wx.EVT_MENU, self.onMenuSelect, helpItem)
 
@@ -92,7 +93,7 @@ class UIFrame(wx.Frame):
         self.scValTC = wx.TextCtrl(self, size=(500, 22))
         hbox1.Add(self.scValTC, flag=flagsR, border=2)  
         hbox1.AddSpacer(5)
-        self.searchBt = wx.Button(self, label='Parse Data', size=(85, 22))
+        self.searchBt = wx.Button(self, label='Parse Data', size=(80, 22))
         self.searchBt.Disable()
         self.searchBt.Bind(wx.EVT_BUTTON, self.onDataParse)
         hbox1.Add(self.searchBt, flag=flagsR, border=2)
@@ -103,7 +104,7 @@ class UIFrame(wx.Frame):
         mSizer.Add(self.progressBar, flag=flagsR, border=2)
         
         mSizer.AddSpacer(5)
-        self.protocalPanel = pl.PanelProtocalDetail(self)
+        self.protocalPanel = pl.PanelProtocolDetail(self)
         mSizer.Add(self.protocalPanel, flag=flagsR, border=2)
         
         mSizer.AddSpacer(5)
@@ -146,6 +147,7 @@ class UIFrame(wx.Frame):
 
 #-----------------------------------------------------------------------------
     def onMenuSelect(self, evt):
+        """ Handle the menu bar selection action."""
         itemId = evt.GetId()
         if itemId == ID_LF:
             # Create open file dialog
@@ -158,7 +160,18 @@ class UIFrame(wx.Frame):
             self.scValTC.SetValue(path)
             self.srcType = 'file'
             self.searchBt.Enable()
+        elif itemId == ID_LD:
+            # Create open directory dialog
+            dlg = wx.DirDialog(self, "Choose a directory:",
+                       style=wx.DD_DEFAULT_STYLE
+                       #| wx.DD_DIR_MUST_EXIST
+                       #| wx.DD_CHANGE_DIR
+                       )
+            if dlg.ShowModal() == wx.ID_OK:
+                self.srcType = 'directory'
+            dlg.Destroy()
         elif itemId == ID_LN:
+            # Create open network interface dialog
             addrs = psutil.net_if_addrs()
             netList = addrs.keys()
             InterfaceSelectorDialog = wx.SingleChoiceDialog(self, 'Select Network Interface You Want to Sniff', 'Network Interface', list(netList))      
