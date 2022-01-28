@@ -10,9 +10,12 @@
 #
 # Created:     2022/01/13
 # Version:     v_0.1
-# Copyright:   n.a
-# License:     n.a
+# Copyright:   NUS-Singtel Cyber Security Research & Development Laboratory
+# License:      Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+#               Everyone is permitted to copy and distribute verbatim copies
+#               of this license document, but changing it is not allowed.
 #-----------------------------------------------------------------------------
+""" All Copyright (C) reserved by NUS-Singtel Cyber Security Research & Development Laboratory"""
 
 import os
 import psutil
