@@ -11,8 +11,8 @@
 #
 # Created:     2022/01/15
 # Version:     v_0.1
-# Copyright:   n.a
-# License:     n.a
+# Copyright:   Copyright (c) 2023 LiuYuancheng
+# License:     MIT License
 #-----------------------------------------------------------------------------
 
 import os

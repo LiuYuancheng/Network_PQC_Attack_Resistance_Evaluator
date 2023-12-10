@@ -1,5 +1,5 @@
-# Packet_Parser [PQC]
-**Program Design Purpose**: We want to check/test whether the communication between two points (such as 2 servers) has the resistance ability for Quantum Crypto Attack.
+# Network PQC Attack Resistance Evaluator
+**Program Design Purpose **: Post-quantum cryptography (PQC), often referred to as quantum-proof, quantum-safe, or quantum-resistant, focuses on the development of cryptographic algorithms, primarily public-key algorithms, designed to withstand potential cryptanalytic attacks by quantum computers. The purpose of our program is to create a dynamic monitoring and evaluation tool. This tool aims to check and test the resistance level / resilience of communication between two points, such as two servers, against Quantum Crypto Attacks. By utilizing this tool, users can gauge the effectiveness of cryptographic measures in real-time, ensuring robust security in the face of emerging quantum threats.
 
 [TOC]
 
@@ -24,19 +24,22 @@
           + [Load packet from network interface](#load-packet-from-network-interface)
       - [Problem and Solution](#problem-and-solution)
 
+------
+
 ### Introduction
 
-This project is aimed to develop a probe/scanner program to analysis the network packets between two points to give the confidence level of the resistance ability for Post Quantum Crypto Attack. 
+Post-quantum cryptographic algorithms are designed with the primary goal of securing systems against potential threats posed by quantum computers. These advanced computing machines have the capability to compromise widely utilized cryptographic schemes, including RSA and ECC. The objective of this project is to develop a sophisticated probe/scanner program. This program will analyze network packets exchanged between two points or all the packets coming in one host, providing a quantitative confidence level regarding their resistance to Quantum Crypto Attacks. The aim is to offer a robust and dynamic assessment tool that empowers users to gauge the security posture of their communication channels in the era of quantum computing advancements.
 
-As we don’t have any way to simulate the quantum crypto attack, so what we want is parsing the network packet from the host/destination  side or in the mid to analysis the network communication protocol to identify whether the communication is quantum safe. We will compare the protocol with our data base quantum safe standard to give a value. The standard we want to use is NSA_Suite_B_Cryptography ‘s Quantum resistant suite. For example: 
+Given the inherent difficulty in simulating quantum crypto attacks with our current hardware, our focus is on parsing network packets from either the host/destination side or within the network midpoints. This approach enables the analysis of network communication protocols to determine their quantum safety. The methodology involves comparing identified protocols against our customizable comprehensive database of quantum-safe standards, specifically utilizing the NSA_Suite_B_Cryptography's Quantum Resistant Suite. For instance: 
 
-- If we find the packet is using protocol OpenSSH 2.3.1(SSH2), as its encryption use aes128-ctr, we say it doesn’t have the resistance ability for Quantum Crypto Attack. 
-
-
-- If we find the packet is using WireGuard protocol, as it is using Curve25519 for key exchange, ChaCha20 for symmetric encryption, Poly1305 for message authentication codes, SipHash for hashtable keys and BLAKE2s for cryptographic hash function, so we are 80% confident about it have the resistance ability for Quantum Crypto Attack. 
+- If a packet employs the OpenSSH 2.3.1(SSH2) protocol with aes128-ctr encryption, we conclude that it lacks resistance against Quantum Crypto Attacks.  
+- If the packet employs the WireGuard protocol, leveraging Curve25519 for key exchange, ChaCha20 for symmetric encryption, Poly1305 for message authentication codes, SipHash for hashtable keys, and BLAKE2s for the cryptographic hash function, we express an 80% confidence level in its resistance against Quantum Crypto Attacks. This systematic evaluation ensures a nuanced understanding of the quantum resilience of various communication protocols, offering valuable insights into the security landscape.
 
 
-###### Packet_Parser_PQC Main UI View: 
+
+##### Network PQC Attack Resistance Evaluator Main UI View
+
+To enhance user experience, our tool includes a user-friendly interface that simplifies the process. Users can effortlessly select the monitor source, allowing them to then assess the P2P quantum attack resistance score along with detailed packet category information. Below is a glimpse of the Network PQC Attack Resistance Evaluator's user interface, providing a clear and intuitive platform for users to navigate and retrieve crucial information.. 
 
 ![](doc/img/mainUI.png)
 

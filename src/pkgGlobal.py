@@ -15,7 +15,7 @@ import os
 print("Current working directory is : %s" % os.getcwd())
 dirpath = os.path.dirname(__file__)
 print("Current source code location : %s" % dirpath)
-APP_NAME = 'Packet_Parser_PQC_v0.1'
+APP_NAME = 'Network_PQC_Attack_Resistance_Evaluator_v0.1'
 WINDOW_SIZE = (800, 600)
 
 #------<CONSTANTS>-------------------------------------------------------------
