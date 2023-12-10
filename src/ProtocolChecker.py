@@ -12,7 +12,7 @@
 # Created:     2022/01/15
 # Version:     v_0.1
 # Copyright:   Copyright (c) 2023 LiuYuancheng
-# License:     MIT License
+# License:     GNU GENERAL PUBLIC LICENSE version3
 #-----------------------------------------------------------------------------
 
 import os

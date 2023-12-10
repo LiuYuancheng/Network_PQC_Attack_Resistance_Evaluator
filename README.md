@@ -1,5 +1,5 @@
 # Network PQC Attack Resistance Evaluator
-**Program Design Purpose **: Post-quantum cryptography (PQC), often referred to as quantum-proof, quantum-safe, or quantum-resistant, focuses on the development of cryptographic algorithms, primarily public-key algorithms, designed to withstand potential cryptanalytic attacks by quantum computers. The purpose of our program is to create a dynamic monitoring and evaluation tool. This tool aims to check and test the resistance level / resilience of communication between two points, such as two servers, against Quantum Crypto Attacks. By utilizing this tool, users can gauge the effectiveness of cryptographic measures in real-time, ensuring robust security in the face of emerging quantum threats.
+**Program Design Purpose **: Post-quantum cryptography (PQC), often referred to as quantum-proof, quantum-safe, or quantum-resistant, focuses on the development of cryptographic algorithms, primarily public-key algorithms, designed to withstand potential cryptanalytic attacks by quantum computers. The purpose of our Network PQC Attack Resistance Evaluator program is to create a dynamic monitoring and evaluation tool. This tool aims to check and test the resistance level / resilience of communication between two points, such as two servers, against Quantum Crypto Attacks. By utilizing this tool, users can gauge the effectiveness of cryptographic measures in real-time, ensuring robust security in the face of emerging quantum threats.
 
 [TOC]
 
@@ -43,7 +43,9 @@ To enhance user experience, our tool includes a user-friendly interface that sim
 
 ![](doc/img/mainUI.png)
 
-`Version: 0.1` 
+`Version: 0.2.1` 
+
+The compatible input network data source can be pcap from Wireshark / t-shark, tcp dump or sniffed packet generate by Ettercap's mirroring function.
 
 
 
@@ -51,41 +53,70 @@ To enhance user experience, our tool includes a user-friendly interface that sim
 
 ### Program Design
 
-The program contents three main parts: 
+#### Program Modules Design Detail
 
-·     Network traffic packet collection/sniffing module.
+The  Network PQC Attack Resistance Evaluator program contents three main parts: 
 
-·     Protocol parsing and QS score calculation matching module. 
+- Network traffic packet collection / sniffing module. 
+- Protocol encryption algorithm quantum attack resistance evaluation module  . 
 
-·     Result visualization UI module.
+- User action heading and result visualization UI module.
 
-###### Packet Collection Module
+The three module will running in three parallel thread and managed by the program main data manager, the detailed work flow is shown below :
 
-The Network traffic packet collection module will sniff all the communication packet from the cap file or from the network interface. 
+![](doc/img/workflow.png)
 
-###### Protocol parsing and match module
+`Version: 0.2.1` 
 
-Parsing the protocol detail from the TCP/UDP layer and above. Match the primitives used by the protocol then generate the confidence level of the resistance ability for Quantum Crypto Attack. Our database need to continuous update during our research.
+##### Network traffic packet collection / sniffing module
 
-###### Result visualization module
+The Network Traffic Packet Collection/Sniffing module is designed to efficiently capture and load all communication packets from either a cap file or directly from the network interface. This module performs a meticulous filtering and categorization of packets based on user-defined settings. Subsequently, it normalizes the packet information, encompassing diverse layer details and message encryption algorithms. The processed information is then seamlessly transmitted to the Evaluation Module for in-depth analysis. This streamlined process ensures a comprehensive and organized approach to packet handling and sets the stage for thorough evaluation and assessment.
 
-We want to design some UI/Dashboard to show all the communication between A and B in a list , then  categorized all the packets by protocol  types and highlight the result we calculated to give the user a conclusion. 
+##### Protocol encryption algorithm quantum attack resistance evaluation module  
 
-##### Program Work Flow 
+The system is equipped to retrieve a quantum attack resistance score map/dictionary from the database. During each communication session between two peers, the Evaluation Module systematically analyze different layers of the network protocol ( layers above the IP layer). Subsequently, it generates a distinctive mark representing the resistance ability against Quantum Crypto Attacks for that specific communication instance. 
 
-Each module will run in a individual thread, the program work flow diagram is shown below: 
+The attack resistance evaluation results will be also archived in the database for future research applications. To ensure the relevance of our analysis, we commit to continuously updating the attack resistance score map/dictionary throughout our ongoing research. Additionally, users have the flexibility to customize their own resistance score maps, tailoring the evaluation process to meet their specific needs.
 
-![](doc/img/DesignFlow.png)
+##### User action heading and result visualization UI module.
 
-##### Data Parsing Process 
+We also provide the UI/Dashboard to take the use source section then show all the communication between A and B in a list , the categorized all the packets by protocol  types and highlight the result we calculated to give the user a conclusion. The design of the User interface display is shown below : 
 
-In the Data Parsing Module we parse the data with below sequence: 
+![](doc/img/uidesign.png)
+
+`Version: 0.2.1` 
+
+#### Network Packet Evaluation Process 
+
+Analyzing protocol intricacies begins with parsing details from the TCP/UDP layer. By meticulously matching the primitives employed by the protocol, we then derive a confidence level indicative of its resistance against Quantum Crypto Attacks. The imperative task of updating our database continually underpins our commitment to staying abreast of evolving research. As an illustrative example, the data parsed from the packet encompasses the following details:
+
+For example we paring these data from the packet: 
+
+**Example-1**: 
+
+When we only check the data layer message encryption use `ssh` as shown below :  
+
+![](doc/img/layer1.png)
+
+We identify the communication has very low resistance ability for quantum crypto attack. Then give it low mark. 
+
+**Example-2:**
+
+When we only check the TCP layer encryption use `wg(wireguard)` as shown below : 
+
+![](doc/img/layer2.png)
+
+We identify the communication may have resistance ability for quantum crypto attack. Then we checked the message layer encryption use `TLC-v1.2`:
+
+![](doc/img/layer3.png)
+
+we will increase the mark to higher. 
+
+Below is the detail work flow of the Data Parsing process : 
 
 ![](doc/img/dataFlow.png)
 
-
-
-##### Protocol QS Score Calculation 
+##### Protocol Quantum Attack Resistance  Score Calculation 
 
 We calculate a protocol's quantum safe score based on the NSA_Suite_B_Cryptography ‘s Quantum resistant suite[https://en.wikipedia.org/wiki/NSA_Suite_B_Cryptography] For example the WireGuard protocol : 
 
@@ -99,6 +130,66 @@ We calculate a protocol's quantum safe score based on the NSA_Suite_B_Cryptograp
 | RSA for key establishment (NIST SP 800-56B rev 1) and digital signatures (FIPS 186-4), minimum 3072-bit modulus to protect up to TOP SECRET | Poly1305     | Yes            |
 
 So we give **WG[QS-Score]** = 6.6667
+
+The current resistance score for each network layers protocol we use is shown below, user can also do the adjustment based on their requirement: 
+
+```
+{
+    "Transport layer": {
+        "DCCP": 0.0,
+        "SCTP": 0.0,
+        "UDP": 0.0,
+        "UDP-Lite": 0.0,
+        "TCP": 0.0,
+        "PortReference": 0.0,
+        "RTP": 0.0,
+        "RTCP": 0.0
+    },
+    "Session layer": {
+        "NetBIOS": 1.0,
+        "NetDump": 1.0,
+        "ONC-RPC": 1.0,
+        "DCE-RPC": 1.0,
+        "HTTP": 1.0,
+        "SMTP": 1.0
+    },
+    "Presentation layer": {
+        "MIME": 1.0
+    },
+    "Application layer": {
+        "ANCP": 2.0,
+        "BOOTP": 2.0,
+        "DHCP": 2.0,
+        "DNS": 2.0,
+        "FTP": 2.0,
+        "IMAP": 2.0,
+        "iWARP-DDP": 2.0,
+        "iWARP-MPA": 2.0,
+        "iWARP-RDMAP": 2.0,
+        "NTP": 2.0,
+        "PANA": 2.0,
+        "POP": 2.0,
+        "RADIUS": 2.0,
+        "RLogin": 2.0,
+        "RSH": 2.0,
+        "SSH": 4.0,
+        "SSHv1": 3.0,
+        "SSHv2": 5.0,
+        "SNMP": 2.0,
+        "Telnet": 2.0,
+        "TFTP": 2.0,
+        "SASP": 3.0,
+        "TLS": 4.0,
+        "TLSv1": 5.0,
+        "TLSv1.1": 5.0,
+        "TLSv1.2": 6.0,
+        "TLSv1.3": 7.0,
+        "WG": 8.0
+    }
+}
+```
+
+Higher score means have higher possible resistance ability for quantum crypto attack.
 
 
 
@@ -128,14 +219,14 @@ So we give **WG[QS-Score]** = 6.6667
 
 | Program File           | Execution Env | Description                                        |
 | ---------------------- | ------------- | -------------------------------------------------- |
-| src/uiRun.py           | python 3      | main UI frame                                      |
+| src/uiRun.py           | python 3      | Main user interface frame.                         |
 | src/uiPanel.py         | python 3      | Result visualization display panel                 |
 | src/pkgGlobal.py       | python 3      | Global parameter controller                        |
 | src/PacketParser.py    | python 3      | Packet paring module.                              |
 | src/ProtocolChecker.py | python 3      | Protocol matching and QS score calculation module. |
 | src/DataMgr.py         | python 3      | Program internal data management module.           |
 | ProtocolRef.json       |               | QS scores matching dictionary.                     |
-| capData/*.cap, *capng  |               | Test packet capture data                           |
+| capData/*.cap, *capng  |               | Test packet capture data files.                    |
 
 
 
@@ -167,7 +258,7 @@ python uiRun.py
 
 2. Select the network interface you want to sniff.
 
-3. set how long you want to sniff (interface:Wi-Fi:**30** <- this number means sniff packets in 30 sec ), please void set the number too big. As I didn't use the file iterator to cache the packet data into a tmp file, so all the sniffed packet data will be saved in your computer memory. If you are watching a video and use the sniff function, there may be a memory error after running the sniff for a shot while. 
+3. set how long you want to sniff (interface: WI-Fi:**30** <- this number means sniff packets in 30 sec ), please void set the number too big. As I didn't use the file iterator to cache the packet data into a tmp file, so all the sniffed packet data will be saved in your computer memory. If you are watching a video and use the sniff function, there may be a memory error after running the sniff for a shot while. 
 
    
 
@@ -181,5 +272,5 @@ Refer to `doc/ProblemAndSolution.md`
 
 ------
 
-> Last edit by LiuYuancheng(liu_yuan_cheng@hotmail.com) at 14/01/2022
+> Last edit by LiuYuancheng (liu_yuan_cheng@hotmail.com) at 14/01/2022, if there is any problem or bug please send me a message.
 
