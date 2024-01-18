@@ -78,7 +78,7 @@ The system is equipped to retrieve a quantum attack resistance score map/diction
 
 The attack resistance evaluation results will be also archived in the database for future research applications. To ensure the relevance of our analysis, we commit to continuously updating the attack resistance score map/dictionary throughout our ongoing research. Additionally, users have the flexibility to customize their own resistance score maps, tailoring the evaluation process to meet their specific needs.
 
-##### User action heading and result visualization UI module.
+##### User action handling and result visualization UI module.
 
 We also provide the UI/Dashboard to take the use source section then show all the communication between A and B in a list , the categorized all the packets by protocol  types and highlight the result we calculated to give the user a conclusion. The design of the User interface display is shown below : 
 
@@ -252,7 +252,7 @@ python uiRun.py
 
 ###### Load packet from network interface 
 
-1. Run the program under **admin permission**. In the UI, select `Load Data` from the menu bar and select `Load From netowork interface`: 
+1. Run the program under **admin permission**. In the UI, select `Load Data` from the menu bar and select `Load From network interface`: 
 
 ![](doc/img/loadN.png)
 
