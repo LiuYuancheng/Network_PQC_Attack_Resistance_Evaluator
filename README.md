@@ -1,5 +1,14 @@
 # Network PQC Attack Resistance Evaluator
-**Program Design Purpose **: Post-quantum cryptography (PQC), often referred to as quantum-proof, quantum-safe, or quantum-resistant, focuses on the development of cryptographic algorithms, primarily public-key algorithms, designed to withstand potential cryptanalytic attacks by quantum computers. The purpose of our Network PQC Attack Resistance Evaluator program is to create a dynamic monitoring and evaluation tool. This tool aims to check and test the resistance level / resilience of communication between two points, such as two servers, against Quantum Crypto Attacks. By utilizing this tool, users can gauge the effectiveness of cryptographic measures in real-time, ensuring robust security in the face of emerging quantum threats.
+**Program Design Purpose**: Post-quantum cryptography (PQC), often referred to as quantum-proof, quantum-safe, or quantum-resistant, focuses on the development of cryptographic algorithms, primarily public-key algorithms, designed to withstand potential cryptanalytic attacks by quantum computers. The purpose of our Network PQC Attack Resistance Evaluator program is to create a dynamic monitoring and evaluation tool. This tool aims to check and test the resistance level / resilience of communication between two points, such as two servers, against Quantum Crypto Attacks. By utilizing this tool, users can gauge the effectiveness of cryptographic measures in real-time, ensuring robust security in the face of emerging quantum threats.
+
+```python
+# Created:     2022/01/16
+# Version:     v_0.1
+# Copyright:   Copyright (c) 2022 LiuYuancheng
+# License:     GNU GENERAL PUBLIC LICENSE version3
+```
+
+**Table of Contents**
 
 [TOC]
 
@@ -217,16 +226,16 @@ Higher score means have higher possible resistance ability for quantum crypto at
 
 ###### Program Files List 
 
-| Program File           | Execution Env | Description                                        |
-| ---------------------- | ------------- | -------------------------------------------------- |
-| src/uiRun.py           | python 3      | Main user interface frame.                         |
-| src/uiPanel.py         | python 3      | Result visualization display panel                 |
-| src/pkgGlobal.py       | python 3      | Global parameter controller                        |
-| src/PacketParser.py    | python 3      | Packet paring module.                              |
-| src/ProtocolChecker.py | python 3      | Protocol matching and QS score calculation module. |
-| src/DataMgr.py         | python 3      | Program internal data management module.           |
-| ProtocolRef.json       |               | QS scores matching dictionary.                     |
-| capData/*.cap, *capng  |               | Test packet capture data files.                    |
+| Program File             | Execution Env | Description                                        |
+| ------------------------ | ------------- | -------------------------------------------------- |
+| `src/uiRun.py`           | python 3      | Main user interface frame.                         |
+| `src/uiPanel.py`         | python 3      | Result visualization display panel                 |
+| `src/pkgGlobal.py`       | python 3      | Global parameter controller                        |
+| `src/PacketParser.py`    | python 3      | Packet paring module.                              |
+| `src/ProtocolChecker.py` | python 3      | Protocol matching and QS score calculation module. |
+| `src/DataMgr.py`         | python 3      | Program internal data management module.           |
+| `ProtocolRef.json`       |               | QS scores matching dictionary.                     |
+| `capData/*.cap, *capng`  |               | Test packet capture data files.                    |
 
 
 

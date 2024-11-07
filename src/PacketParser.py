@@ -11,9 +11,7 @@
 # Created:     2022/01/13
 # Version:     v_0.1
 # Copyright:   Copyright (c) 2022 LiuYuancheng
-# License:      Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
-#               Everyone is permitted to copy and distribute verbatim copies
-#               of this license document, but changing it is not allowed.
+# License:     GNU GENERAL PUBLIC LICENSE version3
 #-----------------------------------------------------------------------------
 """ All Copyright (C) reserved by Liu Yuancheng """
 

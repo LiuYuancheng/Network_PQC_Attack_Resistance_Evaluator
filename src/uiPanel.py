@@ -10,8 +10,8 @@
 #
 # Created:     2022/01/17
 # Version:     v_0.1
-# Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
-# License:     YC
+# Copyright:   Copyright (c) 2022 LiuYuancheng
+# License:     GNU GENERAL PUBLIC LICENSE version3
 #-----------------------------------------------------------------------------
 import wx
 import wx.grid

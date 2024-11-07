@@ -6,10 +6,10 @@
 #
 # Author:      Yuancheng Liu
 #
-# Created:     2019/01/10 (modified on2022/01/14)
+# Created:     2022/01/14
 # Version:     v_0.1
-# Copyright:   n.a
-# License:     n.a
+# Copyright:   Copyright (c) 2022 LiuYuancheng
+# License:     GNU GENERAL PUBLIC LICENSE version3
 #-----------------------------------------------------------------------------
 
 import os
