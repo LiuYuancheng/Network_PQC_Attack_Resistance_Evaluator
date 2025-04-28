@@ -3,7 +3,7 @@
 # Name:        DataMgr.py
 #
 # Purpose:     Data manager module used to control all the other data processing 
-#              modules and store the interprocess/result data.
+#              modules and store the inter process/result data.
 #
 # Author:      Yuancheng Liu
 #
@@ -31,7 +31,7 @@ class DataMgr(object):
     def __init__(self) -> None:
         super().__init__()
         self.parser = pp.PacketParser()
-        self.checker = pc.ProtocoCheker(gv.PRO_SCORE_REF)
+        self.checker = pc.ProtocolChecker(gv.PRO_SCORE_REF)
         self.proList = {}
         self.proSumDict = {}
         self.soreRst = {}

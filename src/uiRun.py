@@ -25,7 +25,7 @@ PERIODIC = 500      # update in every 500ms
 
 ID_LF = 10  # load file menu ID 
 ID_LD = 11  # load directory menu ID 
-ID_LN = 12  # load LAN netowrk interface menu ID
+ID_LN = 12  # load LAN network interface menu ID
 ID_HP = 21  # help menu ID
 
 #-----------------------------------------------------------------------------
@@ -35,21 +35,21 @@ class UIFrame(wx.Frame):
     def __init__(self, parent, id, title):
         """ Init the UI and parameters."""
         wx.Frame.__init__(self, parent, id, title, size=gv.WINDOW_SIZE)
-        # No boader frame:
+        # No boarder frame:
         # wx.Frame.__init__(self, parent, id, title, style=wx.MINIMIZE_BOX | wx.STAY_ON_TOP)
         self.SetBackgroundColour(wx.Colour(200, 210, 200))
         self.SetTransparent(gv.gTranspPct*255//100)
         self.SetIcon(wx.Icon(gv.ICO_PATH))
 
         # Define parameters:
-        self.srcType = 'file'   # packet data srouce file type: 'file' or 'networkI'
+        self.srcType = 'file'   # packet data source file type: 'file' or 'networkI'
         self.capFilePath = ''   # Pcap file path we want to load.
         self.newLoad = False    # flag to identify program has loaded a new cap file.
         self.updateLock = False # periodic update lock flag.
 
         # Build UI sizer
         self._buildToolBars()
-        self.SetSizer(self._buidUISizer())
+        self.SetSizer(self._buildUISizer())
 
         # Define the data manager parallel thread.
         gv.iDataMgr = dm.DataMgrPT(1, 'DataManager Thread')
@@ -80,7 +80,7 @@ class UIFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onMenuSelect, helpItem)
 
 #--UIFrame---------------------------------------------------------------------
-    def _buidUISizer(self):
+    def _buildUISizer(self):
         """ Build the main UI Sizer. """
         flagsR = wx.LEFT | wx.EXPAND
         mSizer = wx.BoxSizer(wx.VERTICAL)
@@ -104,8 +104,8 @@ class UIFrame(wx.Frame):
         mSizer.Add(self.progressBar, flag=flagsR, border=2)
         
         mSizer.AddSpacer(5)
-        self.protocalPanel = pl.PanelProtocolDetail(self)
-        mSizer.Add(self.protocalPanel, flag=flagsR, border=2)
+        self.protocolPanel = pl.PanelProtocolDetail(self)
+        mSizer.Add(self.protocolPanel, flag=flagsR, border=2)
         
         mSizer.AddSpacer(5)
         mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(790, -1),
@@ -139,7 +139,7 @@ class UIFrame(wx.Frame):
         elif self.srcType == 'networkI':
             interfaceInfo = str(self.scValTC.GetValue()).strip() 
             _ , name, pkgNum = interfaceInfo.split(':')
-            print('Load from network inerface: %s' % str(name))
+            print('Load from network interface: %s' % str(name))
             gv.iDataMgr.loadNetLive(name, int(pkgNum))
             self.newLoad = True
             self.progressBar.SetValue(4)
@@ -189,7 +189,7 @@ class UIFrame(wx.Frame):
 #-----------------------------------------------------------------------------
     def onHelp(self, evt):
         """ Pop-up the Help information window. """
-        wx.MessageBox(' If there is any bug, please contect: \n\n \
+        wx.MessageBox(' If there is any bug, please contact: \n\n \
                         Author:      Yuancheng Liu \n \
                         Email:       liu_yuan_cheng@hotmail.com \n \
                         Created:     2022/01/12 \n \
@@ -205,7 +205,7 @@ class UIFrame(wx.Frame):
             print("main frame update at %s" % str(now))
             self.lastPeriodicTime = now
             if self.newLoad and not gv.iDataMgr.checkUpdating():
-                self.protocalPanel.updateGrid()
+                self.protocolPanel.updateGrid()
                 print(">> update the pcap data once")
                 self.progressBar.SetValue(19)
                 self.newLoad = False

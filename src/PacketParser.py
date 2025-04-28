@@ -165,7 +165,7 @@ class protcolRcdDict(object):
     def getUdpPktNum(self):
         return self.udpCount
 
-    def getEncriptDict(self):
+    def getEncryptDict(self):
         return self.encriptDict
 
 #-----------------------------------------------------------------------------

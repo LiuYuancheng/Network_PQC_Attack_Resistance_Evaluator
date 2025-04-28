@@ -38,10 +38,10 @@ class PanelProtocolDetail(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
         self.SetBackgroundColour(wx.Colour(200, 210, 200))
-        self.SetSizer(self._buidUISizer())
+        self.SetSizer(self._buildUISizer())
 
 #-----------------------------------------------------------------------------
-    def _buidUISizer(self):
+    def _buildUISizer(self):
         """ Build the control panel sizer. """
         flagsR = wx.LEFT | wx.EXPAND
         ctSizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -77,10 +77,10 @@ class PanelProtocolDetail(wx.Panel):
         self.updateTFDetail(None)
         for i in range(self.grid.GetNumberRows()):
             self.grid.SetCellBackgroundColour(i, 3, wx.Colour(255, 255, 255))        
-        if gv.iDataMgr.getProtocalDict() is None or gv.iDataMgr.getScoreDict() is None: return 
+        if gv.iDataMgr.getProtocolDict() is None or gv.iDataMgr.getScoreDict() is None: return 
         
         rowIdx = 0
-        for key, value in gv.iDataMgr.getProtocalDict().items():
+        for key, value in gv.iDataMgr.getProtocolDict().items():
             if rowIdx > 10: self.grid.AppendRows(numRows=1, updateLabels=True)
             # set protocol info cells
             self.grid.SetCellValue(rowIdx, 0, value.getSourceIPaddr())
@@ -102,17 +102,17 @@ class PanelProtocolDetail(wx.Panel):
         if srcIP != '' and distIP != '':
             keyStr= srcIP +'-'+distIP
             # print(keyStr)
-            if keyStr in gv.iDataMgr.getProtocalDict().keys():
+            if keyStr in gv.iDataMgr.getProtocolDict().keys():
                 self.updateTFDetail(None) # clear the text field.
                 self.updateTFDetail("----- %s -----" % str(datetime.today()))
-                dataSet = gv.iDataMgr.getProtocalDict()[keyStr]
+                dataSet = gv.iDataMgr.getProtocolDict()[keyStr]
                 self.updateTFDetail("Src IP address : %s" %str(dataSet.getSourceIPaddr()))
                 self.updateTFDetail("Dest IP address : %s" %str(dataSet.getDistIPaddr()))
-                self.updateTFDetail("Total Pecket Num : %s" %str(dataSet.getTotolPktNum()))
-                self.updateTFDetail("Total TCP Pecket Num : %s" %str(dataSet.getTcpPktNum()))
-                self.updateTFDetail("Total UDP Pecket Num : %s" %str(dataSet.getUdpPktNum()))
+                self.updateTFDetail("Total Packet Num : %s" %str(dataSet.getTotolPktNum()))
+                self.updateTFDetail("Total TCP Packet Num : %s" %str(dataSet.getTcpPktNum()))
+                self.updateTFDetail("Total UDP Packet Num : %s" %str(dataSet.getUdpPktNum()))
                 self.updateTFDetail("Encryption Layer Section :")
-                for key, val in dataSet.getEncriptDict().items():
+                for key, val in dataSet.getEncryptDict().items():
                     self.updateTFDetail(' > ' + str(key) + ' : ' + str(val))
             self.updateTFDetail("----- ******* -----")
             self.updateTFDetail(" Quantum attack resistance confidence level (0-10):\n [ %s ]" %str(gv.iDataMgr.getScoreDict()[keyStr]))
@@ -134,7 +134,7 @@ class PanelProtocolDetail(wx.Panel):
 def main():
     """ Main function used for local test debug panel. """
     print('TestCase start: type in the panel you want to check:')
-    print('0 - PanelImge')
+    print('0 - PanelImage')
     print('1 - PanelCtrl')
     #pyin = str(input()).rstrip('\n')
     #testPanelIdx = int(pyin)

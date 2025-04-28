@@ -23,9 +23,9 @@ import pkgGlobal as gv
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-class ProtocoCheker(object):
+class ProtocolChecker(object):
     """ Count all the protocol packets and match with the Quantum safe score 
-        database to give the final confidence level of resistence ability for 
+        database to give the final confidence level of resistance ability for 
         the quantum cyber attack. 
     """
     def __init__(self, Dblink, DbType='json', debugFlag=False):
@@ -47,7 +47,7 @@ class ProtocoCheker(object):
             Args:
                 compareDict ([dict]): 
                 example data:
-                compareDict = { 'notEncript': 5,
+                compareDict = { 'notEncrypt': 5,
                                 'Layer WG': 13, 
                                 'DATALayer TLS': 3, 
                                 'TLSv1 Record Layer: Handshake Protocol: Multiple Handshake Messages': 2,
@@ -55,7 +55,7 @@ class ProtocoCheker(object):
                                 'TLSv1 Record Layer: Handshake Protocol: Encrypted Handshake Message': 2, 
                                 'TLSv1 Record Layer: Application Data Protocol: ldap': 9}
             Returns:
-                [float]: final confidence level of resistence ability for the quantum 
+                [float]: final confidence level of resistance ability for the quantum 
                 cyber attack. 
         """
         if not self.scoreDict: return 0.0
@@ -69,7 +69,7 @@ class ProtocoCheker(object):
             else:
                 for proK in self.scoreDict[gv.LAYER_A_TAG].keys():
                     # find the highest score: for example if it is 'TLSv1.3' it will match with
-                    # 'TLS' get 5.0 then match with 'TLSv1.3' get 7.0, then the final reuslt is 7.0.
+                    # 'TLS' get 5.0 then match with 'TLSv1.3' get 7.0, then the final result is 7.0.
                     if (proK in cKey) and (self.scoreDict[gv.LAYER_A_TAG][proK] > tempVal):
                         tempVal = self.scoreDict[gv.LAYER_A_TAG][proK]
 
@@ -81,7 +81,7 @@ class ProtocoCheker(object):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 def testCase():
-    checker = ProtocoCheker('ProtocolRef.json')
+    checker = ProtocolChecker('ProtocolRef.json')
     testCompareDict = { 'notEncript': 5,
                             'Layer WG': 13, 
                             'DATALayer TLS': 3, 
