@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
-"""
-HTTP/HTTPS Request Monitor for Ubuntu
-======================================
-Records ALL outbound HTTP/HTTPS requests, including those to non-existent domains.
+#!/usr/bin/env python3
+#-----------------------------------------------------------------------------
+# Name:        httpRequestLogger.py
+#
+# Purpose:     HTTP/HTTPS outgoing Request Monitor for Ubuntu Records ALL outbound 
+#              HTTP/HTTPS requests, including those to non-existent domains.
+#
+# Author:      Yuancheng Liu
+#
+# Created:     2026/02/21
+# Copyright:   
+# License:     
+#-----------------------------------------------------------------------------
 
-HOW IT WORKS:
+"""
+Workflow:
   - Sniffs raw packets on port 80 (HTTP) and 443 (HTTPS/TLS)
   - Extracts HTTP Host headers + method + path for clear-text HTTP
   - Extracts TLS SNI from ClientHello for HTTPS (no decryption needed)
@@ -16,16 +26,6 @@ REQUIREMENTS:
   sudo apt-get install python3-pip libpcap-dev tcpdump
   sudo pip3 install scapy --break-system-packages
 
-RUN AS ROOT:
-  sudo python3 http_monitor.py
-  sudo python3 http_monitor.py --iface eth0 --log /var/log/http_monitor.log
-  sudo python3 http_monitor.py --json          # JSON output per line
-
-OPTIONS:
-  --iface IFACE       Network interface to sniff (default: auto-detect)
-  --log   FILE        Log file path (default: ./http_requests.log)
-  --no-dns            Disable DNS pre-capture layer
-  --json              Write each event as a JSON object (one per line)
 """
 
 import argparse
@@ -88,8 +88,6 @@ def gDebugPrint(msg, prt=True, logType=LOG_INFO):
         Log.info(msg)
 
 gCurrentNIC = None 
-
-
 
 # --------------------------------------------------------------------------- #
 # Constants
@@ -275,7 +273,6 @@ def get_default_interface():
     return "eth0"
 
 # --------------------------------------------------------------------------- #
-# Main
 # --------------------------------------------------------------------------- #
 def main():
     global gCurrentNIC
@@ -294,5 +291,6 @@ def main():
     bpf += " or udp port 53"
     sniff(iface=gCurrentNIC, filter=bpf, prn=dispatcher, store=False)
 
+# --------------------------------------------------------------------------- #
 if __name__ == "__main__":
     main()

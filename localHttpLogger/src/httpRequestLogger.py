@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #-----------------------------------------------------------------------------
-# Name:        Log.py
+# Name:        httpRequestLogger.py
 #
 # Purpose:     Local HTTP/HTTPS Traffic Monitor using pyshark (tshark) : Captures 
 #              outbound HTTP/HTTPS traffic from a network interface logs all the 
