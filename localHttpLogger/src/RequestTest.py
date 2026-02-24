@@ -1,3 +1,5 @@
+# Send a simple request from another none admin user to see whether the request 
+# can be logged by the httpRequestLogger.py
 import requests
 
 # The URL you want to send the request to

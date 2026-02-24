@@ -1,3 +1,6 @@
+# Send a simple log4j request from another none admin user to see whether the request 
+# can be logged by the httpRequestLogger.py
+
 import logging
 import logging.handlers
 import requests

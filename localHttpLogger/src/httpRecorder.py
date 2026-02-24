@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-#!/usr/bin/env python3
 #-----------------------------------------------------------------------------
-# Name:        httpRequestLogger.py
+# Name:        httpRecorder.py
 #
 # Purpose:     HTTP/HTTPS outgoing Request Monitor for Ubuntu Records ALL outbound 
 #              HTTP/HTTPS requests, including those to non-existent domains.
@@ -9,8 +8,8 @@
 # Author:      Yuancheng Liu
 #
 # Created:     2026/02/21
-# Copyright:   
-# License:     
+# Copyright:   Copyright (c) 2025 LiuYuancheng
+# License:     GNU General Public License V3   
 #-----------------------------------------------------------------------------
 
 """
@@ -28,45 +27,34 @@ REQUIREMENTS:
 
 """
 
-import argparse
 import datetime
-import json
-import logging
 import os
 import re
 import signal
 import sys
 import threading
-from logging.handlers import RotatingFileHandler
+import Log
 
 # --------------------------------------------------------------------------- #
 # Dependency check
 # --------------------------------------------------------------------------- #
 try:
-    from scapy.all import (
-        sniff, IP, IPv6, TCP, UDP, DNS, DNSQR,
-        Raw, get_if_list,
-    )
+    from scapy.all import ( sniff, IP, IPv6, TCP, UDP, DNS, DNSQR, Raw, get_if_list)
 except ImportError:
     print("ERROR: scapy not installed.")
     print("Fix : sudo pip3 install scapy --break-system-packages")
     sys.exit(1)
 
-import Log
-
 #-----------------------------------------------------------------------------
 print("Current working directory is : %s" % os.getcwd())
 DIR_PATH = dirpath = os.path.dirname(os.path.abspath(__file__))
 print("Current source code location : %s" % dirpath)
-APP_NAME = ('httpRequestLogger', 'RequestOut')
-
+APP_NAME = ('httpRecorder', 'RequestOut')
 TOP_DIR = 'src'
 
 idx = dirpath.rfind(TOP_DIR)
 gTopDir = dirpath[:idx + len(TOP_DIR)] if idx != -1 else dirpath   # found it - truncate right after TOPDIR
-# Config the lib folder 
 
-import Log
 Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLogsUnderDate=True)
 
 DEBUG_FLG   = False
@@ -87,20 +75,12 @@ def gDebugPrint(msg, prt=True, logType=LOG_INFO):
     elif logType == LOG_INFO or DEBUG_FLG:
         Log.info(msg)
 
+# The current NIC to capture packets from.
 gCurrentNIC = None 
-
-# --------------------------------------------------------------------------- #
-# Constants
-# --------------------------------------------------------------------------- #
-DEFAULT_LOG_FILE = "./http_requests.log"
-LOG_MAX_BYTES    = 10 * 1024 * 1024   # 10 MB
-LOG_BACKUP_COUNT = 5
 
 # --------------------------------------------------------------------------- #
 # Globals (set in main)
 # --------------------------------------------------------------------------- #
-_logger    = None
-_json_mode = False
 _seen      = set()
 _seen_lock = threading.Lock()
 
@@ -110,12 +90,9 @@ _seen_lock = threading.Lock()
 def record(etype: str, src: str, dst: str, dport: int, detail: str):
     key = f"{etype}|{src}|{dst}|{dport}|{detail}"
     with _seen_lock:
-        if key in _seen:
-            return
+        if key in _seen: return
         _seen.add(key)
-        if len(_seen) > 8000:
-            _seen.clear()
-
+        if len(_seen) > 8000: _seen.clear()
     ts = datetime.datetime.now().isoformat(timespec="seconds")
     proto = {443: "HTTPS", 80: "HTTP", 0: "DNS"}.get(dport, str(dport))
     line  = f"[{ts}] [{etype:<10}] {proto:5} | {src} → {dst}:{dport} | {detail}"
@@ -126,8 +103,7 @@ def record(etype: str, src: str, dst: str, dport: int, detail: str):
 # --------------------------------------------------------------------------- #
 def on_dns(pkt):
     try:
-        if pkt[DNS].qr != 0 or not pkt.haslayer(DNSQR):
-            return
+        if pkt[DNS].qr != 0 or not pkt.haslayer(DNSQR): return
         name = pkt[DNSQR].qname
         if isinstance(name, bytes):
             name = name.decode(errors="replace").rstrip(".")
@@ -176,45 +152,39 @@ def _sni_from_client_hello(data: bytes):
         if not hs or hs[0] != 0x01:                   # ClientHello
             return None
         off = 1 + 3 + 2 + 32                           # type+len+version+random
-        if len(hs) < off + 1:
-            return None
+        if len(hs) < off + 1: return None
         off += 1 + hs[off]                             # session id
-        if len(hs) < off + 2:
-            return None
+        if len(hs) < off + 2: return None
         off += 2 + int.from_bytes(hs[off:off+2], "big")  # cipher suites
-        if len(hs) < off + 1:
-            return None
+        if len(hs) < off + 1: return None
         off += 1 + hs[off]                             # compression methods
-        if len(hs) < off + 2:
-            return None
+        if len(hs) < off + 2: return None
         ext_end = off + 2 + int.from_bytes(hs[off:off+2], "big")
-        off    += 2
+        off += 2
         while off + 4 <= ext_end:
-            et   = int.from_bytes(hs[off:off+2], "big")
-            el   = int.from_bytes(hs[off+2:off+4], "big")
-            ed   = hs[off+4:off+4+el]
+            et = int.from_bytes(hs[off:off+2], "big")
+            el = int.from_bytes(hs[off+2:off+4], "big")
+            ed = hs[off+4:off+4+el]
             off += 4 + el
             if et == 0:                                # server_name
                 if len(ed) >= 5:
                     nl = int.from_bytes(ed[3:5], "big")
                     return ed[5:5+nl].decode(errors="replace")
-    except Exception:
-        pass
+    except Exception as err :
+        gDebugPrint(f"Error parsing SNI: {err}")
     return None
 
 def on_https(pkt):
     try:
-        if not pkt.haslayer(Raw):
-            return
+        if not pkt.haslayer(Raw): return
         sni = _sni_from_client_hello(bytes(pkt[Raw]))
-        if not sni:
-            return
+        if not sni: return
         src = pkt[IP].src if pkt.haslayer(IP) else pkt[IPv6].src
         dst = pkt[IP].dst if pkt.haslayer(IP) else pkt[IPv6].dst
         record("HTTPS/TLS", str(src), str(dst), 443,
                f"SNI={sni}  url=https://{sni}/")
-    except Exception:
-        pass
+    except Exception as err:
+        gDebugPrint(f"Error parsing HTTPS: {err}")
 
 # --------------------------------------------------------------------------- #
 # TCP SYN fallback — always logs the connection attempt
@@ -228,8 +198,8 @@ def on_syn(pkt, port):
         dst = pkt[IP].dst if pkt.haslayer(IP) else pkt[IPv6].dst
         record("TCP_SYN", str(src), str(dst), port,
                f"connection attempt → {dst}:{port}")
-    except Exception:
-        pass
+    except Exception as err:
+        gDebugPrint(f"Error parsing TCP: {err}")
 
 # --------------------------------------------------------------------------- #
 # Master dispatcher
@@ -254,7 +224,6 @@ def list_interfaces():
     result = subprocess.run(["tshark", "-D"], capture_output=True, text=True)
     gDebugPrint("Available interfaces:\n%s" %str(result.stdout or result.stderr))
 
-
 #-----------------------------------------------------------------------------
 def get_default_interface():
     """Try to find the default outbound interface."""
@@ -277,16 +246,13 @@ def get_default_interface():
 def main():
     global gCurrentNIC
     gDebugPrint("Start the local http(s) request logger module.")
-
     signal.signal(signal.SIGINT,  lambda *_: (print("\n[*] Stopped."), sys.exit(0)))
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
-
     list_interfaces()
     if gCurrentNIC is None: 
         gDebugPrint("[x] No network interface configured, try to use the 1st one as default.")
         gCurrentNIC = get_default_interface()
     gDebugPrint("Start to capture the http(s) request on interface: %s" % str(gCurrentNIC))
-
     bpf = "tcp port 80 or tcp port 443"
     bpf += " or udp port 53"
     sniff(iface=gCurrentNIC, filter=bpf, prn=dispatcher, store=False)
