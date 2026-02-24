@@ -9,14 +9,14 @@
 # Author:      Yuancheng Liu
 #
 # Created:     2026/02/23
-# Copyright:   
-# License:     
+# Copyright:   Copyright (c) 2025 LiuYuancheng
+# License:     GNU General Public License V3
 #-----------------------------------------------------------------------------
 
 """
 Requirements:
     sudo apt install tshark
-    pip3 install pyshark
+    pip3 install pyshark --break-system-packages
 
 Notes:
     - HTTP (port 80) traffic is fully decoded: method, host, URI, headers.
@@ -28,14 +28,9 @@ Notes:
 
 import pyshark
 import logging
-import argparse
 import sys
 import os
-import socket
-import struct
-import fcntl
 import signal
-from datetime import datetime
 
 import Log
 
@@ -44,12 +39,10 @@ print("Current working directory is : %s" % os.getcwd())
 DIR_PATH = dirpath = os.path.dirname(os.path.abspath(__file__))
 print("Current source code location : %s" % dirpath)
 APP_NAME = ('httpRequestLogger', 'RequestOut')
-
 TOP_DIR = 'src'
 
 idx = dirpath.rfind(TOP_DIR)
 gTopDir = dirpath[:idx + len(TOP_DIR)] if idx != -1 else dirpath   # found it - truncate right after TOPDIR
-# Config the lib folder 
 
 import Log
 Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLogsUnderDate=True)
@@ -72,12 +65,13 @@ def gDebugPrint(msg, prt=True, logType=LOG_INFO):
     elif logType == LOG_INFO or DEBUG_FLG:
         Log.info(msg)
 
+# The current NIC to capture packets from.
 gCurrentNIC = None 
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 def list_interfaces():
-    """Print available network interfaces."""
+    """Use tshark(Wireshark) to print available network interfaces."""
     import subprocess
     result = subprocess.run(["tshark", "-D"], capture_output=True, text=True)
     gDebugPrint("Available interfaces:\n%s" %str(result.stdout or result.stderr))
@@ -87,28 +81,24 @@ def get_default_interface():
     """Try to find the default outbound interface."""
     try:
         import subprocess
-        result = subprocess.run(
-            ["ip", "route", "show", "default"],
-            capture_output=True, text=True
-        )
+        result = subprocess.run(["ip", "route", "show", "default"], capture_output=True, text=True)
         for part in result.stdout.split():
             if part not in ("default", "via", "dev", "proto", "metric", "src"):
                 if not part[0].isdigit():
                     return part
-    except Exception:
-        pass
+    except Exception as err:
+        gDebugPrint("Failed to get default interface: %s" %str(err), LOG_ERR)
     return "eth0"
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-def handle_packet(packet, logger: logging.Logger):
+def handle_packet(packet):
     """Called for every captured packet."""
     try:
         # Grab IP layer info
         src_ip  = packet.ip.src  if hasattr(packet, "ip") else "?"
         dst_ip  = packet.ip.dst  if hasattr(packet, "ip") else "?"
         proto   = packet.transport_layer or "?"
-
         src_port = "?"
         dst_port = "?"
         if hasattr(packet, "tcp"):
@@ -128,14 +118,12 @@ def handle_packet(packet, logger: logging.Logger):
                 ua       = getattr(http, "user_agent",       "-")
                 referer  = getattr(http, "referer",          "-")
                 ct       = getattr(http, "content_type",     "-")
-
                 url = f"http://{host}{uri}"
                 gDebugPrint(
                     f"[HTTP  REQUEST ] {src_ip}:{src_port} → {dst_ip}:{dst_port} | "
                     f"{method} {url} {version} | "
                     f"User-Agent={ua} | Referer={referer} | Content-Type={ct}"
                 )
-
             # Log HTTP responses (optional if we want ot get a possible C2 response)
             elif hasattr(http, "response_code"):
                 status  = getattr(http, "response_code",    "-")
@@ -215,7 +203,7 @@ def start_capture():
     signal.signal(signal.SIGTERM, stop)
     try:
         for packet in capture.sniff_continuously():
-            handle_packet(packet, logger)
+            handle_packet(packet)
     except Exception as e:
         if "closed" not in str(e).lower():
             gDebugPrint(f"Capture error: {e}", logType=LOG_ERR)
